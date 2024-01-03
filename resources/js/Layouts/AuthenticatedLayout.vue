@@ -4,8 +4,11 @@ import {router, usePage} from "@inertiajs/vue3";
 
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
+import DropdownLink from '@/Components/DropdownLink.vue';
+import Dropdown from '@/Components/Dropdown.vue';
 
 import Button from 'primevue/button';
+import InputText from 'primevue/InputText';
 
 ////////////////////////////////////////////////
 
@@ -23,7 +26,7 @@ const menuItems = ref([
 </script>
 
 <template>
-    <div class="lg:grid lg:grid-cols-[15%,85%] p-2 text-gray-700">
+    <div class="lg:grid lg:grid-cols-[15%,85%] gap-8 p-2 text-gray-700">
         <nav>
             <div class="sidebar max-lg:hidden">
                 <div class="grid-rows-6">
@@ -110,11 +113,55 @@ const menuItems = ref([
                     </div>
                 </div>
             </div>
-
         </nav>
 
-        <div>
-            <slot></slot>
+        <div class="mt-8">
+            <div>
+                <div class="hidden lg:flex">
+                    <div class="grow flex">
+                        <InputText class="rounded-lg w-3/4 p-3 font-medium" placeholder="Search for files and folders" />
+                    </div>
+                    <!-- Settings Dropdown -->
+                    <div class="ms-3 relative ml-auto mr-10 self-center">
+                        <Dropdown align="right" width="48">
+                            <template #trigger>
+                                        <span class="inline-flex rounded-md">
+                                            <button
+                                                type="button"
+                                                class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150"
+                                            >
+                                                {{ $page.props.auth.user.name }}
+
+                                                <svg
+                                                    class="ms-2 -me-0.5 h-4 w-4"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    viewBox="0 0 20 20"
+                                                    fill="currentColor"
+                                                >
+                                                    <path
+                                                        fill-rule="evenodd"
+                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                                        clip-rule="evenodd"
+                                                    />
+                                                </svg>
+                                            </button>
+                                        </span>
+                            </template>
+
+                            <template #content>
+                                <DropdownLink :href="route('profile.edit')"> Profile </DropdownLink>
+                                <DropdownLink :href="route('logout')" method="post" as="button">
+                                    Log Out
+                                </DropdownLink>
+                            </template>
+                        </Dropdown>
+                    </div>
+                </div>
+            </div>
+
+            <main>
+                <slot></slot>
+            </main>
         </div>
     </div>
 
