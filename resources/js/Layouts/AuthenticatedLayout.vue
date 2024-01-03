@@ -118,7 +118,7 @@ const menuItems = ref([
         <div class="mt-8">
             <div>
                 <div class="hidden lg:flex">
-                    <div class="grow flex">
+                    <div class="grow flex" v-if="$page.url !== '/profile'">
                         <InputText class="rounded-lg w-3/4 p-3 font-medium" placeholder="Search for files and folders" />
                     </div>
                     <!-- Settings Dropdown -->
