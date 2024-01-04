@@ -36,7 +36,7 @@ const calculateLastModified = (lastModified) => {
     const lastModifiedDate = new Date(lastModified);
     const currentDate = new Date();
 
-    return Math.ceil(Math.abs(currentDate - lastModifiedDate) / (1000 * 60 *60 * 24))
+    return Math.round(Math.abs(currentDate - lastModifiedDate) / (1000 * 60 *60 * 24))
 }
 
 const onRowReorder = (event) => {
