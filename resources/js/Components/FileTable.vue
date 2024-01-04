@@ -43,6 +43,19 @@ const onRowReorder = (event) => {
     files.value = event.value;
 }
 
+// Source: https://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript
+const formatBytes = (bytes, decimals = 2) => {
+    if (!+bytes) return '0.00 B'
+
+    const k = 1024
+    const dm = decimals < 0 ? 0 : decimals
+    const sizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
+}
+
 
 const files = ref();
 
@@ -67,7 +80,11 @@ const files = ref();
                 </template>
             </Column>
             <Column field="modified" header="Last Modified" sortable :headerStyle="{background: tableHeadBackground}"></Column>
-            <Column field="size" header="Size" sortable :headerStyle="{background: tableHeadBackground}"></Column>
+            <Column field="size" header="Size" sortable :headerStyle="{background: tableHeadBackground}">
+                <template #body="{data, field}">
+                    {{formatBytes(data[field])}}
+                </template>
+            </Column>
         </DataTable>
     </div>
 </template>
