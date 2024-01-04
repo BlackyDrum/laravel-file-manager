@@ -70,7 +70,7 @@ const files = ref();
         </div>
     </div>
     <div class="mt-4">
-        <DataTable class="font-sans" @rowReorder="onRowReorder" v-model:selection="selectedFiles" :value="files" tableStyle="min-width: 50rem">
+        <DataTable class="font-sans shadow-lg" @rowReorder="onRowReorder" v-model:selection="selectedFiles" :value="files" tableStyle="min-width: 50rem">
             <Column rowReorder :headerStyle="{background: tableHeadBackground, width: '3rem'}" />
             <Column selectionMode="multiple" :headerStyle="{background: tableHeadBackground}"></Column>
             <Column field="name" header="Name" sortable :headerStyle="{background: tableHeadBackground}"></Column>
