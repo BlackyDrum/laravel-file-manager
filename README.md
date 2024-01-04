@@ -70,3 +70,6 @@ $ php artisan serve
 ```
 10. **Visit http://localhost:8000 in your web browser to access the application.**
 
+## License
+
+This project is licensed under the [MIT license](https://opensource.org/licenses/MIT).
