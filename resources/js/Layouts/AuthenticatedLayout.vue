@@ -122,7 +122,7 @@ const menuItems = ref([
                         <InputText class="rounded-lg w-3/4 p-3 font-medium" placeholder="Search for files and folders" />
                     </div>
                     <!-- Settings Dropdown -->
-                    <div class="ms-3 relative ml-auto mr-10 self-center">
+                    <div class="relative ml-auto mr-10 self-center">
                         <Dropdown align="right" width="48">
                             <template #trigger>
                                         <span class="inline-flex rounded-md">
