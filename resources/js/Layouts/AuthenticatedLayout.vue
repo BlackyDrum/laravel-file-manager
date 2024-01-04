@@ -36,7 +36,7 @@ const menuItems = ref([
                         </div>
                         <div class="self-center">
                         <span class="lg:text-xl font-medium text-xs">
-                            File Manager
+                            <a href="/dashboard">File Manager</a>
                         </span>
                         </div>
                     </div>
@@ -51,6 +51,19 @@ const menuItems = ref([
                             </li>
                         </ul>
                     </div>
+                </div>
+                <hr class="border-gray-300">
+                <div>
+                    <ul>
+                        <li :class="{'bg-[#EEF2FF] text-[#4338CC] font-bold' : $page.url === '/profile'}" class="w-full mb-2 mt-4 p-2 rounded-lg font-medium cursor-pointer"
+                            @click="router.visit('/profile')">
+                            Profile
+                        </li>
+                        <li class="w-full p-2 rounded-lg font-medium cursor-pointer"
+                            @click="router.post('/logout')">
+                            Logout
+                        </li>
+                    </ul>
                 </div>
             </div>
 
