@@ -40,7 +40,6 @@ const calculateLastModified = (lastModified) => {
 }
 
 const onRowReorder = (event) => {
-    console.log(event.value)
     files.value = event.value;
 }
 
