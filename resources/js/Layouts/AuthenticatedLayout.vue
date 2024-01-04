@@ -32,7 +32,9 @@ const menuItems = ref([
                 <div class="grid-rows-6">
                     <div class="flex">
                         <div class="self-center">
-                            <ApplicationLogo />
+                            <a href="/dashboard">
+                                <ApplicationLogo />
+                            </a>
                         </div>
                         <div class="self-center">
                         <span class="lg:text-xl font-medium text-xs">
