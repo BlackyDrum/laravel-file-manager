@@ -11,7 +11,13 @@ class FileController extends Controller
 {
     public function dashboard(Request $request)
     {
-        $files = Files::query()->where('owner_id', '=', Auth::id())->get();
+        $files = Files::query()->where('owner_id', '=', Auth::id())
+            ->join('users', 'users.id', '=', 'owner_id')
+            ->select([
+                'users.name AS username',
+                'files.*'
+            ])
+            ->get();
 
         return Inertia::render('Dashboard', [
             'files' => $files,

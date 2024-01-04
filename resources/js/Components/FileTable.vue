@@ -53,10 +53,14 @@ const files = ref();
         </div>
     </div>
     <div class="mt-4">
-        <DataTable class="font-medium" v-model:selection="selectedFiles" :value="files" tableStyle="min-width: 50rem">
+        <DataTable class="font-sans" v-model:selection="selectedFiles" :value="files" tableStyle="min-width: 50rem">
             <Column selectionMode="multiple" :headerStyle="{background: tableHeadBackground}"></Column>
             <Column field="name" header="Name" :headerStyle="{background: tableHeadBackground}"></Column>
-            <Column field="owner_id" header="Owner" :headerStyle="{background: tableHeadBackground}"></Column>
+            <Column field="owner_id" header="Owner" :headerStyle="{background: tableHeadBackground}">
+                <template #body="{data, field}">
+                    {{data["username"]}} {{data[field] === $page.props.auth.user.id ? '(me)' : data[field]}}
+                </template>
+            </Column>
             <Column field="modified" header="Last Modified" :headerStyle="{background: tableHeadBackground}"></Column>
             <Column field="size" header="Size" :headerStyle="{background: tableHeadBackground}"></Column>
         </DataTable>
