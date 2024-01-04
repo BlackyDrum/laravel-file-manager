@@ -88,7 +88,7 @@ const menuItems = ref([
             <!-- Responsive Navigation Menu -->
             <div
                 :class="{ block: showingNavigationDropdown, hidden: !showingNavigationDropdown }"
-                class="lg:hidden"
+                class="lg:hidden bg-white mt-2 rounded-lg"
             >
                 <div class="pt-2 pb-3 space-y-1">
                     <ResponsiveNavLink v-for="item in menuItems" :key="item.url" :href="route(item.url)" :active="route().current(item.url)">
