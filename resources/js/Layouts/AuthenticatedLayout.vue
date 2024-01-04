@@ -159,7 +159,7 @@ const menuItems = ref([
                 </div>
             </div>
 
-            <main class="mr-10">
+            <main class="lg:mr-10 mr-5">
                 <slot></slot>
             </main>
         </div>
