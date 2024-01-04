@@ -26,7 +26,7 @@
 ## Requirements
 <ul>
     <li>PHP: ^8.3</li>
-    <li>Node: ^18.12</li>
+    <li>Node: ^20.10</li>
     <li>Composer: ^2.5</li>
 </ul>
 
