@@ -61,14 +61,14 @@ const files = ref();
         <DataTable class="font-sans" @rowReorder="onRowReorder" v-model:selection="selectedFiles" :value="files" tableStyle="min-width: 50rem">
             <Column rowReorder :headerStyle="{background: tableHeadBackground, width: '3rem'}" />
             <Column selectionMode="multiple" :headerStyle="{background: tableHeadBackground}"></Column>
-            <Column field="name" header="Name" :headerStyle="{background: tableHeadBackground}"></Column>
-            <Column field="owner_id" header="Owner" :headerStyle="{background: tableHeadBackground}">
+            <Column field="name" header="Name" sortable :headerStyle="{background: tableHeadBackground}"></Column>
+            <Column field="owner_id" header="Owner" sortable :headerStyle="{background: tableHeadBackground}">
                 <template #body="{data, field}">
                     {{data["username"]}} {{data[field] === $page.props.auth.user.id ? '(me)' : data[field]}}
                 </template>
             </Column>
-            <Column field="modified" header="Last Modified" :headerStyle="{background: tableHeadBackground}"></Column>
-            <Column field="size" header="Size" :headerStyle="{background: tableHeadBackground}"></Column>
+            <Column field="modified" header="Last Modified" sortable :headerStyle="{background: tableHeadBackground}"></Column>
+            <Column field="size" header="Size" sortable :headerStyle="{background: tableHeadBackground}"></Column>
         </DataTable>
     </div>
 </template>
