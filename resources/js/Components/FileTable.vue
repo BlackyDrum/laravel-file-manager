@@ -39,6 +39,11 @@ const calculateLastModified = (lastModified) => {
     return Math.ceil(Math.abs(currentDate - lastModifiedDate) / (1000 * 60 *60 * 24))
 }
 
+const onRowReorder = (event) => {
+    console.log(event.value)
+    files.value = event.value;
+}
+
 
 const files = ref();
 
@@ -53,7 +58,8 @@ const files = ref();
         </div>
     </div>
     <div class="mt-4">
-        <DataTable class="font-sans" v-model:selection="selectedFiles" :value="files" tableStyle="min-width: 50rem">
+        <DataTable class="font-sans" @rowReorder="onRowReorder" v-model:selection="selectedFiles" :value="files" tableStyle="min-width: 50rem">
+            <Column rowReorder :headerStyle="{background: tableHeadBackground, width: '3rem'}" />
             <Column selectionMode="multiple" :headerStyle="{background: tableHeadBackground}"></Column>
             <Column field="name" header="Name" :headerStyle="{background: tableHeadBackground}"></Column>
             <Column field="owner_id" header="Owner" :headerStyle="{background: tableHeadBackground}">
