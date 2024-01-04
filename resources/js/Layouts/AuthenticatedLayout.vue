@@ -37,8 +37,8 @@ const menuItems = ref([
                             </a>
                         </div>
                         <div class="self-center">
-                        <span class="lg:text-xl font-medium text-xs">
-                            <a href="/dashboard">File Manager</a>
+                        <span class="xl:text-xl font-medium text-md">
+                            <a href="/dashboard">Laravel File Manager</a>
                         </span>
                         </div>
                     </div>
