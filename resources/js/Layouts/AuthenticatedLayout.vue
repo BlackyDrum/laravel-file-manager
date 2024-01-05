@@ -40,7 +40,7 @@ const menuItems = ref([
 
 
 const onRemoveTemplatingFile = (file, removeFileCallback, index) => {
-    removeFileCallback(index);
+    files.value.splice(index, 1)
 };
 
 const onSelectedFiles = (event) => {
