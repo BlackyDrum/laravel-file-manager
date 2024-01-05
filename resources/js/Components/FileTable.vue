@@ -23,6 +23,7 @@ const page = usePage();
 
 const tableHeadBackground = ref("#DADADA");
 const selectedFiles = ref([]);
+const files = ref();
 
 onMounted(() => {
     files.value = page.props.files;
@@ -56,9 +57,6 @@ const formatBytes = (bytes, decimals = 2) => {
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
 }
 
-
-const files = ref();
-
 </script>
 
 <template>
@@ -70,7 +68,7 @@ const files = ref();
         </div>
     </div>
     <div class="mt-4">
-        <DataTable class="font-sans shadow-lg" @rowReorder="onRowReorder" v-model:selection="selectedFiles" :value="files" tableStyle="min-width: 50rem">
+        <DataTable v-if="$page.props.files.length !== 0" class="font-sans shadow-lg" @rowReorder="onRowReorder" v-model:selection="selectedFiles" :value="files" tableStyle="min-width: 50rem">
             <Column rowReorder :headerStyle="{background: tableHeadBackground, width: '3rem'}" />
             <Column selectionMode="multiple" :headerStyle="{background: tableHeadBackground}"></Column>
             <Column field="name" header="Name" sortable :headerStyle="{background: tableHeadBackground}"></Column>
@@ -86,6 +84,15 @@ const files = ref();
                 </template>
             </Column>
         </DataTable>
+        <div v-else>
+            <div class="flex flex-col">
+                <div class="pi pi-cloud-upload mx-auto my-20 text-[10rem]"></div>
+                <div class="mx-auto text-2xl">
+                    Upload Files to get started!
+                </div>
+            </div>
+
+        </div>
     </div>
 </template>
 
