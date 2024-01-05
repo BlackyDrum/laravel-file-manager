@@ -39,7 +39,11 @@ class FileController extends Controller
         $files = $request->allFiles();
 
         foreach ($files as $file) {
-            dd($file[0]->getClientOriginalName());
+            Files::query()->create([
+                'name' => $file[0]->getClientOriginalName(),
+                'size' => $file[0]->getSize(),
+                'owner_id' => Auth::id(),
+            ]);
         }
 
         return back();

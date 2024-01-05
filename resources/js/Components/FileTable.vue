@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, defineProps } from 'vue';
+import {onMounted, ref, defineProps, onUpdated} from 'vue';
 import {usePage} from "@inertiajs/vue3";
 
 import Button from 'primevue/button';
@@ -31,6 +31,10 @@ onMounted(() => {
     for (let i = 0; i < files.value.length; i++) {
         files.value[i]['modified'] = `${calculateLastModified(files.value[i].updated_at)} days ago`;
     }
+})
+
+onUpdated(() => {
+    files.value = page.props.files;
 })
 
 const calculateLastModified = (lastModified) => {
