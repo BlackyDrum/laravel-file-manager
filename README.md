@@ -70,6 +70,15 @@ $ php artisan serve
 ```
 10. **Visit http://localhost:8000 in your web browser to access the application.**
 
+<br>
+
+## Adjusting Maximum File Size
+If you wish to modify the maximum file size allowed for uploads, navigate to your ``.env`` file and update the ``MAX_FILE_SIZE`` variable.
+```
+MAX_FILE_SIZE=1024000  # Set the maximum file size in bytes
+```
+**Note**: Ensure that you update the ``upload_max_filesize`` and ``post_max_size`` values in your ``php.ini`` file to match the desired maximum file size.
+
 ## License
 
 This project is licensed under the [MIT license](https://opensource.org/licenses/MIT).
