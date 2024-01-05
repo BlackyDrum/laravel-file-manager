@@ -251,7 +251,8 @@ const handleFileUploadDialog = () => {
                         <Button @click="uploadEvent()" icon="pi pi-cloud-upload" rounded outlined severity="success" :disabled="!files || files.length === 0"></Button>
                         <Button @click="clearCallback()" icon="pi pi-times" rounded outlined severity="danger" :disabled="!files || files.length === 0"></Button>
                     </div>
-                    <ProgressBar></ProgressBar>
+                    <ProgressBar v-if="fileForm.processing" :value="fileForm.progress.percentage" :showValue="false" :class="['md:w-20rem h-1rem w-full md:ml-auto']"
+                    ></ProgressBar>
                 </div>
             </template>
             <template #content="{ files, uploadedFiles, removeUploadedFileCallback, removeFileCallback }">
