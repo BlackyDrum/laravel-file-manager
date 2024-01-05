@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import {router, usePage} from "@inertiajs/vue3";
+import {computed, onMounted, onUpdated, ref, watch} from 'vue';
+import {router, usePage, useForm} from "@inertiajs/vue3";
 
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
@@ -9,12 +9,26 @@ import Dropdown from '@/Components/Dropdown.vue';
 
 import Button from 'primevue/button';
 import InputText from 'primevue/InputText';
+import Dialog from 'primevue/dialog';
+import FileUpload from 'primevue/fileupload';
+import Badge from 'primevue/Badge';
+import ProgressBar from 'primevue/ProgressBar';
+import Toast from 'primevue/toast';
+import {useToast} from "primevue/usetoast";
 
 ////////////////////////////////////////////////
 
 const page = usePage();
+const toast = useToast();
 
-const showingNavigationDropdown = ref(false)
+const showingNavigationDropdown = ref(false);
+const showFileUploadDialog = ref(false);
+
+const files = ref([]);
+const maxFileSize = ref(import.meta.env.VITE_MAX_FILE_SIZE);
+const fileForm = useForm({
+    files: files.value
+});
 
 
 const menuItems = ref([
@@ -23,9 +37,57 @@ const menuItems = ref([
     { label: "Shared by me", url: "shared-by-me" },
 ]);
 
+
+
+const onRemoveTemplatingFile = (file, removeFileCallback, index) => {
+    removeFileCallback(index);
+};
+
+const onSelectedFiles = (event) => {
+    files.value = event.files;
+
+    for (let i = 0; i < files.value.length; i++) {
+        files.value[i].pending = true;
+    }
+};
+
+const uploadEvent = () => {
+    fileForm.files = files.value;
+
+    fileForm.post('/upload', {
+        onError: (error) => {
+            for (const e in error) {
+                toast.add({ severity: 'error', summary: 'Error', detail: error[e], life: 6000 });
+            }
+        },
+        onSuccess: (response) => {
+            files.value.splice(0);
+            toast.add({ severity: 'success', summary: 'Success', detail: 'Files uploaded', life: 3000 });
+        }
+    })
+};
+
+const formatBytes = (bytes, decimals = 2) => {
+    if (!+bytes) return '0.00 B'
+
+    const k = 1024
+    const dm = decimals < 0 ? 0 : decimals
+    const sizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
+}
+
+const handleFileUploadDialog = () => {
+    showFileUploadDialog.value = !showFileUploadDialog.value;
+}
+
+
 </script>
 
 <template>
+    <Toast />
     <div class="lg:grid lg:grid-cols-[15%,85%] gap-8 p-2 text-gray-700">
         <nav>
             <div class="sidebar max-lg:hidden">
@@ -43,7 +105,7 @@ const menuItems = ref([
                         </div>
                     </div>
                     <div class="my-2">
-                        <Button class="w-full" label="Add File" icon="pi pi-plus" />
+                        <Button class="w-full" label="Add File" icon="pi pi-plus" @click="handleFileUploadDialog" />
                     </div>
                     <div class="my-6">
                         <ul>
@@ -180,4 +242,48 @@ const menuItems = ref([
         </div>
     </div>
 
+    <Dialog v-model:visible="showFileUploadDialog" :style="{ width: '50rem' }" modal header="Upload">
+        <FileUpload name="files[]" url="/upload" :multiple="true" accept="" :maxFileSize="maxFileSize" @select="onSelectedFiles">
+            <template #header="{ chooseCallback, uploadCallback, clearCallback, files }">
+                <div class="flex flex-wrap justify-content-between align-items-center flex-1 gap-2">
+                    <div class="flex gap-2">
+                        <Button @click="chooseCallback()" icon="pi pi-images" rounded outlined></Button>
+                        <Button @click="uploadEvent()" icon="pi pi-cloud-upload" rounded outlined severity="success" :disabled="!files || files.length === 0"></Button>
+                        <Button @click="clearCallback()" icon="pi pi-times" rounded outlined severity="danger" :disabled="!files || files.length === 0"></Button>
+                    </div>
+                    <ProgressBar></ProgressBar>
+                </div>
+            </template>
+            <template #content="{ files, uploadedFiles, removeUploadedFileCallback, removeFileCallback }">
+                <div v-if="files.length > 0">
+                    <div class="flex flex-wrap p-0 sm:p-5 gap-5">
+                        <div v-for="(file, index) of files" :key="file.name + file.type + file.size" class="card m-0 px-6 flex flex-column border-1 surface-border align-items-center gap-3">
+                            <div class="self-center">
+                                <img role="presentation" :alt="file.name" :src="file.objectURL" width="100" height="50" class="shadow-2" />
+                            </div>
+                            <span class="font-semibold self-center">{{ file.name }}</span>
+                            <div class="self-center">{{ formatBytes(file.size) }}</div>
+                            <Badge class="self-center" value="Pending" severity="warning" />
+                            <Button class="self-center" icon="pi pi-times" @click="onRemoveTemplatingFile(file, removeFileCallback, index)" outlined rounded  severity="danger" />
+                        </div>
+                    </div>
+                </div>
+
+            </template>
+            <template #empty>
+                <div class="text-[#9CA3AF]">
+                    <div class="flex">
+                        <div class="mx-auto">
+                            <i class="pi pi-cloud-upload border-2 border-[#BFC3CB] rounded-full border-circle p-5 text-8xl text-400 border-400" />
+                        </div>
+                    </div>
+                    <div class="text-center mt-4">
+                        Drag and drop files to here to upload.
+                    </div>
+                </div>
+            </template>
+        </FileUpload>
+    </Dialog>
+
 </template>
+

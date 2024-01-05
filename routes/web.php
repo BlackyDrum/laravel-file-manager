@@ -26,6 +26,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    Route::post('/upload', [\App\Http\Controllers\FileController::class, 'upload'])->name('upload');
+
     Route::get('/dashboard', [\App\Http\Controllers\FileController::class, 'dashboard'])->name('dashboard');
 
     Route::get('/shared-with-me', function () {
