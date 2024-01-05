@@ -26,7 +26,7 @@
 ## Requirements
 <ul>
     <li>PHP: ^8.3</li>
-    <li>Node: ^18.12</li>
+    <li>Node: ^20.10</li>
     <li>Composer: ^2.5</li>
 </ul>
 
@@ -70,3 +70,6 @@ $ php artisan serve
 ```
 10. **Visit http://localhost:8000 in your web browser to access the application.**
 
+## License
+
+This project is licensed under the [MIT license](https://opensource.org/licenses/MIT).
