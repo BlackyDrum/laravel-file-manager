@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Files;
+use App\Rules\ValidateFileName;
 use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,8 +33,14 @@ class FileController extends Controller
 
         $request->validate([
             'files' => 'required|array|min:1',
-            'files.*' => 'required|file|max:'. ($maxFileSize / 1024),
+            'files.*' => ['bail', 'required', 'file', 'max:' . ($maxFileSize / 1024), new ValidateFileName()],
         ]);
+
+        $files = $request->allFiles();
+
+        foreach ($files as $file) {
+            dd($file[0]->getClientOriginalName());
+        }
 
         return back();
     }
