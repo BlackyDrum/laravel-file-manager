@@ -41,6 +41,7 @@ const menuItems = ref([
 
 const onRemoveTemplatingFile = (file, removeFileCallback, index) => {
     files.value.splice(index, 1)
+    fileForm.cancel();
 };
 
 const onSelectedFiles = (event) => {
@@ -249,7 +250,7 @@ const handleFileUploadDialog = () => {
                     <div class="flex gap-2">
                         <Button @click="chooseCallback()" icon="pi pi-images" rounded outlined></Button>
                         <Button @click="uploadEvent()" icon="pi pi-cloud-upload" rounded outlined severity="success" :disabled="!files || files.length === 0"></Button>
-                        <Button @click="clearCallback()" icon="pi pi-times" rounded outlined severity="danger" :disabled="!files || files.length === 0"></Button>
+                        <Button @click="clearCallback(); fileForm.cancel();" icon="pi pi-times" rounded outlined severity="danger" :disabled="!files || files.length === 0"></Button>
                     </div>
                     <ProgressBar v-if="fileForm.processing" :value="fileForm.progress.percentage" :showValue="false" :class="['md:w-20rem h-1rem w-full md:ml-auto']"
                     ></ProgressBar>
