@@ -59,10 +59,6 @@ const calculateLastModified = (lastModified) => {
     return Math.round(Math.abs(currentDate - lastModifiedDate) / (1000 * 60 *60 * 24))
 }
 
-const onRowReorder = (event) => {
-    files.value = event.value;
-}
-
 // Source: https://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript
 const formatBytes = (bytes, decimals = 2) => {
     if (!+bytes) return '0.00 B'
@@ -120,8 +116,7 @@ const confirmFileDeletion = () => {
         </div>
     </div>
     <div class="mt-4">
-        <DataTable v-if="$page.props.files.length !== 0" :filters="filters" class="font-sans shadow-lg" @rowReorder="onRowReorder" v-model:selection="selectedFiles" :value="files" tableStyle="min-width: 50rem">
-            <Column rowReorder :headerStyle="{background: tableHeadBackground, width: '3rem'}" />
+        <DataTable v-if="$page.props.files.length !== 0" :filters="filters" class="font-sans shadow-lg" v-model:selection="selectedFiles" :value="files" tableStyle="min-width: 50rem">
             <Column selectionMode="multiple" :headerStyle="{background: tableHeadBackground}"></Column>
             <Column field="name" header="Name" sortable :headerStyle="{background: tableHeadBackground}"></Column>
             <Column field="owner_id" header="Owner" sortable :headerStyle="{background: tableHeadBackground}">
