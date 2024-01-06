@@ -47,12 +47,13 @@ class FileController extends Controller
                       'xls', 'xlsx', 'ppt', 'pptx', 'doc', 'docx', 'xps'];
 
         $request->validate([
-            'files' => 'required|array|min:1',
+            'files' => 'required|array|min:1|max:10',
             'files.*' => ['bail', 'required', 'file', \Illuminate\Validation\Rules\File::types($fileTypes) ,'max:' . ($maxFileSize / 1024), new ValidateFileName()],
         ], [
             'files.required' => 'You need to provide at least 1 file',
             'files.array' => 'You need to provide at least 1 file',
             'files.min' => 'You need to provide at least 1 file',
+            'files.max' => 'You can only upload 10 files at once',
             'files.*.mimes' => 'The file must be a file of type: :values',
             'files.*.required' => 'Invalid file',
             'files.*.file' => 'Invalid file',
