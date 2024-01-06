@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import {onMounted, ref, defineProps, onUpdated} from 'vue';
-import {usePage} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
+
+import { useConfirm } from "primevue/useconfirm";
+import {useToast} from "primevue/usetoast";
 
 import Button from 'primevue/button';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
+import ConfirmDialog from 'primevue/confirmdialog';
+import Toast from 'primevue/toast';
 
 
 interface File {
@@ -20,6 +25,8 @@ defineProps<{
 }>();
 
 const page = usePage();
+const confirm = useConfirm();
+const toast = useToast();
 
 const tableHeadBackground = ref("#DADADA");
 const selectedFiles = ref([]);
@@ -61,14 +68,46 @@ const formatBytes = (bytes, decimals = 2) => {
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
 }
 
+const confirmFileDeletion = () => {
+    if (selectedFiles.value.length === 0) return;
+
+    confirm.require({
+        message: 'Do you want to delete the selected files?',
+        header: 'Delete Confirmation',
+        icon: 'pi pi-info-circle',
+        rejectClass: 'p-button-text p-button-text',
+        acceptClass: 'p-button-danger p-button-text',
+        accept: () => {
+            window.axios.delete('/files', {
+                data: {
+                    files: selectedFiles.value
+                }
+            })
+                .then(response => {
+                    toast.add({ severity: 'success', summary: 'Success', detail: response.data.message, life: 3000 });
+
+                    router.reload();
+                })
+                .catch(error => {
+                    toast.add({ severity: 'error', summary: 'Error', detail: error.response.data.message, life: 6000 });
+                })
+        },
+        reject: () => {
+            //toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+        }
+    });
+}
+
 </script>
 
 <template>
+    <ConfirmDialog />
+    <Toast />
     <div class="flex">
         <div class="flex gap-3 ml-auto">
             <Button class="text-black border-gray-300 bg-white font-medium" label="Share" icon="pi pi-share-alt" />
             <Button class="font-medium" label="Download" icon="pi pi-download" />
-            <Button class="text-black border-gray-300 bg-white font-medium" label="Delete" icon="pi pi-trash" />
+            <Button class="text-black border-gray-300 bg-white font-medium" label="Delete" icon="pi pi-trash" :disabled="selectedFiles.length === 0" @click="confirmFileDeletion" />
         </div>
     </div>
     <div class="mt-4">

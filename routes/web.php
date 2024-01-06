@@ -27,6 +27,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::post('/upload', [\App\Http\Controllers\FileController::class, 'upload'])->name('upload');
+    Route::delete('/files', [\App\Http\Controllers\FileController::class, 'delete'])->name('delete');
 
     Route::get('/dashboard', [\App\Http\Controllers\FileController::class, 'dashboard'])->name('dashboard');
 
