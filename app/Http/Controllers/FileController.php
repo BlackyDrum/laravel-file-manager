@@ -36,8 +36,6 @@ class FileController extends Controller
         $request->validate([
             'files' => 'required|array|min:1',
             'files.*' => ['bail', 'required', 'file', 'max:' . ($maxFileSize / 1024), new ValidateFileName()],
-        ], [
-            'files.*' => 'You need to provide at least 1 file',
         ]);
 
         $files = $request->allFiles();

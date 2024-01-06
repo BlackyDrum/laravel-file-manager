@@ -93,6 +93,7 @@ const confirmFileDeletion = () => {
             })
                 .then(response => {
                     toast.add({ severity: 'success', summary: 'Success', detail: response.data.message, life: 3000 });
+                    selectedFiles.value.splice(0);
 
                     router.reload();
                 })
