@@ -112,8 +112,9 @@ const handleFileDownload = () => {
             link.click();
             document.body.removeChild(link);
         })
-        .catch(error => {
-            toast.add({ severity: 'error', summary: 'Error', detail: error.response.data.message, life: 6000 });
+        .catch(e => {
+            const error = JSON.parse(new TextDecoder('utf-8').decode(new Uint8Array(e.response.data)))
+            toast.add({ severity: 'error', summary: 'Error', detail: error.message, life: 6000 });
         });
 };
 
