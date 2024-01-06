@@ -197,7 +197,7 @@ const handleFileUploadDialog = () => {
             <div>
                 <div class="hidden lg:flex">
                     <div class="grow flex" v-if="$page.url !== '/profile'">
-                        <InputText class="rounded-lg w-3/4 p-3 font-medium" placeholder="Search for files and folders" />
+                        <InputText class="rounded-lg w-3/4 p-3 font-medium" placeholder="Search for files" />
                     </div>
                     <!-- Settings Dropdown -->
                     <div class="relative ml-auto mr-10 self-center">
