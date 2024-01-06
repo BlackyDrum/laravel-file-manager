@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onMounted, ref, defineProps, onUpdated} from 'vue';
+import {onMounted, ref, defineProps, onUpdated, onBeforeUpdate} from 'vue';
 import {router, usePage} from "@inertiajs/vue3";
 
 import { useConfirm } from "primevue/useconfirm";
@@ -10,6 +10,7 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import ConfirmDialog from 'primevue/confirmdialog';
 import Toast from 'primevue/toast';
+import {FilterMatchMode} from "primevue/api";
 
 
 interface File {
@@ -20,9 +21,7 @@ interface File {
     created_at: string
 }
 
-defineProps<{
-    files: File
-}>();
+const props = defineProps(['filterInput', 'files'])
 
 const page = usePage();
 const confirm = useConfirm();
@@ -32,12 +31,17 @@ const tableHeadBackground = ref("#DADADA");
 const selectedFiles = ref([]);
 const files = ref();
 
+const filters = ref({
+    'global': {value: null, matchMode: 'contains'},
+});
+
 onMounted(() => {
     updateFiles();
 })
 
 onUpdated(() => {
     updateFiles();
+    filters.value.global.value = props.filterInput
 })
 
 const updateFiles = () => {
@@ -115,7 +119,7 @@ const confirmFileDeletion = () => {
         </div>
     </div>
     <div class="mt-4">
-        <DataTable v-if="$page.props.files.length !== 0" class="font-sans shadow-lg" @rowReorder="onRowReorder" v-model:selection="selectedFiles" :value="files" tableStyle="min-width: 50rem">
+        <DataTable v-if="$page.props.files.length !== 0" :filters="filters" class="font-sans shadow-lg" @rowReorder="onRowReorder" v-model:selection="selectedFiles" :value="files" tableStyle="min-width: 50rem">
             <Column rowReorder :headerStyle="{background: tableHeadBackground, width: '3rem'}" />
             <Column selectionMode="multiple" :headerStyle="{background: tableHeadBackground}"></Column>
             <Column field="name" header="Name" sortable :headerStyle="{background: tableHeadBackground}"></Column>

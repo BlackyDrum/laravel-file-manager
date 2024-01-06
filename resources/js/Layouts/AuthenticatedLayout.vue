@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, onMounted, onUpdated, ref, watch} from 'vue';
+import {computed, onMounted, onUpdated, ref, watch, defineEmits} from 'vue';
 import {router, usePage, useForm} from "@inertiajs/vue3";
 
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
@@ -21,8 +21,11 @@ import {useToast} from "primevue/usetoast";
 const page = usePage();
 const toast = useToast();
 
+const emit = defineEmits(['filterInput']);
+
 const showingNavigationDropdown = ref(false);
 const showFileUploadDialog = ref(false);
+const filterInput = ref(null);
 
 const files = ref([]);
 const maxFileSize = ref(import.meta.env.VITE_MAX_FILE_SIZE);
@@ -197,7 +200,7 @@ const handleFileUploadDialog = () => {
             <div>
                 <div class="hidden lg:flex">
                     <div class="grow flex" v-if="$page.url !== '/profile'">
-                        <InputText class="rounded-lg w-3/4 p-3 font-medium" placeholder="Search for files" />
+                        <InputText class="rounded-lg w-3/4 p-3 font-medium" v-model="filterInput" @input="emit('filterInput', filterInput)" placeholder="Search for files" />
                     </div>
                     <!-- Settings Dropdown -->
                     <div class="relative ml-auto mr-10 self-center">
