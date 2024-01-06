@@ -110,8 +110,8 @@ const confirmFileDeletion = () => {
     <Toast />
     <div class="flex">
         <div class="flex gap-3 ml-auto">
-            <Button class="text-black border-gray-300 bg-white font-medium" label="Share" icon="pi pi-share-alt" />
-            <Button class="font-medium" label="Download" icon="pi pi-download" />
+            <Button class="text-black border-gray-300 bg-white font-medium" label="Share" icon="pi pi-share-alt" :disabled="selectedFiles.length === 0" />
+            <Button class="font-medium" label="Download" icon="pi pi-download" :disabled="selectedFiles.length === 0" />
             <Button class="text-black border-gray-300 bg-white font-medium" label="Delete" icon="pi pi-trash" :disabled="selectedFiles.length === 0" @click="confirmFileDeletion" />
         </div>
     </div>
