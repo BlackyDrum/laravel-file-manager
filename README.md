@@ -18,7 +18,6 @@
 ## Features
 - **User-friendly Interface:** Intuitive UI for easy navigation and file management.
 - **File Upload/Download:** Quickly upload and download files with ease.
-- **Directory Structure:** Organize files effortlessly with a structured directory layout.
 - **File Sharing:** Share files securely with customizable sharing options.
 - **Security:** Built with Laravel best practices to ensure data security.
 
