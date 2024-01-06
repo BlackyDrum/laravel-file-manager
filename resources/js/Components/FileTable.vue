@@ -13,14 +13,6 @@ import Toast from 'primevue/toast';
 import {FilterMatchMode} from "primevue/api";
 
 
-interface File {
-    name: string,
-    size: number,
-    owner_id: number,
-    updated_at: string,
-    created_at: string
-}
-
 const props = defineProps(['filterInput', 'files'])
 
 const page = usePage();
