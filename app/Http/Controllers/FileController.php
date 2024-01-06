@@ -50,7 +50,12 @@ class FileController extends Controller
             'files' => 'required|array|min:1',
             'files.*' => ['bail', 'required', 'file', \Illuminate\Validation\Rules\File::types($fileTypes) ,'max:' . ($maxFileSize / 1024), new ValidateFileName()],
         ], [
-            'files.*.mimes' => 'The file must be a file of type: :values'
+            'files.required' => 'You need to provide at least 1 file',
+            'files.array' => 'You need to provide at least 1 file',
+            'files.min' => 'You need to provide at least 1 file',
+            'files.*.mimes' => 'The file must be a file of type: :values',
+            'files.*.required' => 'Invalid file',
+            'files.*.file' => 'Invalid file',
         ]);
 
         $files = $request->allFiles();
