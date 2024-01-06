@@ -22,6 +22,7 @@ const toast = useToast();
 const tableHeadBackground = ref("#DADADA");
 const selectedFiles = ref([]);
 const files = ref();
+const isDownloading = ref(false);
 
 const filters = ref({
     'global': {value: null, matchMode: 'contains'},
@@ -103,6 +104,8 @@ const handleFileDownload = () => {
 
     const identifiers = selectedFiles.value.map(item => ({ identifier: item.identifier }));
 
+    isDownloading.value = true;
+
     window.axios.post('/download', { files: identifiers }, { responseType: 'arraybuffer' })
         .then(response => {
             const zipBlob = new Blob([response.data], { type: 'application/zip' });
@@ -118,6 +121,9 @@ const handleFileDownload = () => {
         .catch(e => {
             const error = JSON.parse(new TextDecoder('utf-8').decode(new Uint8Array(e.response.data)))
             toast.add({ severity: 'error', summary: 'Error', detail: error.message, life: 6000 });
+        })
+        .finally(() => {
+            isDownloading.value = false;
         });
 };
 
@@ -129,7 +135,7 @@ const handleFileDownload = () => {
     <div class="flex">
         <div class="flex gap-3 ml-auto">
             <Button class="text-black border-gray-300 bg-white font-medium" label="Share" icon="pi pi-share-alt" :disabled="selectedFiles.length === 0" />
-            <Button class="font-medium" label="Download" icon="pi pi-download" :disabled="selectedFiles.length === 0" @click="handleFileDownload" />
+            <Button class="font-medium" label="Download" :icon="isDownloading ? 'pi pi-spin pi-spinner' : 'pi pi-download'" :disabled="selectedFiles.length === 0" @click="handleFileDownload" />
             <Button class="text-black border-gray-300 bg-white font-medium" label="Delete" icon="pi pi-trash" :disabled="selectedFiles.length === 0" @click="confirmFileDeletion" />
         </div>
     </div>
