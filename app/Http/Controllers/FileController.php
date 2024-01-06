@@ -50,7 +50,7 @@ class FileController extends Controller
                 $id = $file->store('user_uploads/' . Auth::id());
 
                 Files::query()->create([
-                    'identifier' => substr($id, strrpos($id, '/') + 1),
+                    'identifier' => basename($id),
                     'name' => $file->getClientOriginalName(),
                     'size' => $file->getSize(),
                     'owner_id' => Auth::id(),
