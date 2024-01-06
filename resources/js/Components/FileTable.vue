@@ -96,7 +96,10 @@ const confirmFileDeletion = () => {
 }
 
 const handleFileDownload = () => {
-
+    if (selectedFiles.value.length > 10) {
+        toast.add({ severity: 'info', summary: 'Info', detail: 'You can only download 10 files at once', life: 6000 });
+        return;
+    }
 
     const identifiers = selectedFiles.value.map(item => ({ identifier: item.identifier }));
 
