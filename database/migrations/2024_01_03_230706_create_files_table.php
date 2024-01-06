@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('files', function (Blueprint $table) {
             $table->id();
+            $table->string('identifier', 255)->unique();
             $table->string('name', 64);
             $table->unsignedBigInteger('size');
             $table->unsignedBigInteger('owner_id');
