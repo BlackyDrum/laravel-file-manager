@@ -13,7 +13,7 @@ import Toast from 'primevue/toast';
 import {FilterMatchMode} from "primevue/api";
 
 
-const props = defineProps(['filterInput', 'files'])
+const props = defineProps(['filterInput', 'files', 'errors'])
 
 const page = usePage();
 const confirm = useConfirm();
@@ -95,6 +95,28 @@ const confirmFileDeletion = () => {
     });
 }
 
+const handleFileDownload = () => {
+
+
+    const identifiers = selectedFiles.value.map(item => ({ identifier: item.identifier }));
+
+    window.axios.post('/download', { files: identifiers }, { responseType: 'arraybuffer' })
+        .then(response => {
+            const zipBlob = new Blob([response.data], { type: 'application/zip' });
+
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(zipBlob);
+            link.download = 'files.zip';
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        })
+        .catch(error => {
+            toast.add({ severity: 'error', summary: 'Error', detail: error.response.data.message, life: 6000 });
+        });
+};
+
 </script>
 
 <template>
@@ -103,13 +125,13 @@ const confirmFileDeletion = () => {
     <div class="flex">
         <div class="flex gap-3 ml-auto">
             <Button class="text-black border-gray-300 bg-white font-medium" label="Share" icon="pi pi-share-alt" :disabled="selectedFiles.length === 0" />
-            <Button class="font-medium" label="Download" icon="pi pi-download" :disabled="selectedFiles.length === 0" />
+            <Button class="font-medium" label="Download" icon="pi pi-download" :disabled="selectedFiles.length === 0" @click="handleFileDownload" />
             <Button class="text-black border-gray-300 bg-white font-medium" label="Delete" icon="pi pi-trash" :disabled="selectedFiles.length === 0" @click="confirmFileDeletion" />
         </div>
     </div>
     <div class="mt-4">
         <DataTable v-if="$page.props.files.length !== 0" :filters="filters" class="font-sans shadow-lg" v-model:selection="selectedFiles"
-                   :value="files" tableStyle="min-width: 50rem" stateStorage="session" stateKey="dt-state-file-manager">
+                   :value="files" tableStyle="min-width: 50rem">
             <Column selectionMode="multiple" :headerStyle="{background: tableHeadBackground}"></Column>
             <Column field="name" header="Name" sortable :headerStyle="{background: tableHeadBackground}"></Column>
             <Column field="owner_id" header="Owner" sortable :headerStyle="{background: tableHeadBackground}">

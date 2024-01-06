@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use \Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use const http\Client\Curl\AUTH_ANY;
 
 class FileController extends Controller
 {
@@ -73,6 +74,46 @@ class FileController extends Controller
         }
 
         return back();
+    }
+
+    public function download(Request $request)
+    {
+        $request->validate([
+            'files' => 'required|array|min:1|max:10',
+            'files.*.identifier' => ['bail', 'required', 'string', 'exists:files,identifier', new ValidateFileOwner()]
+        ], [
+            'files.required' => 'You need to provide at least 1 file',
+            'files.array' => 'You need to provide at least 1 file',
+            'files.min' => 'You need to provide at least 1 file',
+            'files.max' => 'You can only download 10 files at once',
+            'files.*.identifier.*' => 'Invalid file'
+        ]);
+
+        $files = $request->input('files');
+
+        $filesPath = storage_path() . '/app/user_uploads/' . Auth::id() . '/';
+
+        $zip = new \ZipArchive();
+        $zipPath = '/tmp/' . Auth::id() . '.zip';
+
+        if (!$zip->open(storage_path() . '/app' . $zipPath, \ZipArchive::CREATE)) {
+            abort(500, 'Server Error');
+        }
+
+        foreach ($files as $file) {
+            $identifier = $file['identifier'];
+            $filename = Files::query()->where('identifier', '=', $identifier)->first()->name;
+
+            $zip->addFile($filesPath . $identifier, $filename);
+        }
+
+        $zip->close();
+
+        register_shutdown_function(function() use ($zipPath) {
+            Storage::delete($zipPath);
+        });
+
+        return Storage::download($zipPath, 'Files.zip');
     }
 
     public function delete(Request $request)
