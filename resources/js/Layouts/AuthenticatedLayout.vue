@@ -33,6 +33,22 @@ const fileForm = useForm({
     files: files.value
 });
 
+const fileTypes = ref(['zip', 'tar', 'rar', 'gzip', '7z',
+    'mp3', 'mp4', 'mpeg', 'wav', 'ogg', 'opus',
+    'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg',
+    'css', 'html', 'php', 'c', 'cpp', 'h', 'hpp', 'js', 'java', 'py',
+    'txt', 'pdf', 'log',
+    'webm', 'mpeg4', '3gpp', 'mov', 'avi', 'wmv', 'flv', 'ogg',
+    'xls', 'xlsx', 'ppt', 'pptx', 'doc', 'docx', 'xps']);
+
+const getFileTypes = computed(() => {
+    fileTypes.value = fileTypes.value.map(v => {
+        return '.' + v;
+    })
+
+    return fileTypes.value.join(', ');
+})
+
 
 const menuItems = ref([
     { label: "Dashboard", url: "dashboard" },
@@ -247,7 +263,7 @@ const handleFileUploadDialog = () => {
     </div>
 
     <Dialog v-model:visible="showFileUploadDialog" :style="{ width: '50rem' }" modal header="Upload">
-        <FileUpload name="files[]" url="/upload" :multiple="true" accept="" :maxFileSize="maxFileSize" @select="onSelectedFiles">
+        <FileUpload name="files[]" url="/upload" :multiple="true" :accept="getFileTypes" :maxFileSize="maxFileSize" @select="onSelectedFiles">
             <template #header="{ chooseCallback, uploadCallback, clearCallback, files }">
                 <div class="flex flex-wrap justify-content-between align-items-center flex-1 gap-2">
                     <div class="flex gap-2">

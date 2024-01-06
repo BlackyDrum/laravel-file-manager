@@ -37,9 +37,19 @@ class FileController extends Controller
     {
         $maxFileSize = intval(env('MAX_FILE_SIZE'));
 
+        $fileTypes = ['zip', 'tar', 'rar', 'gzip', '7z',
+                      'mp3', 'mp4', 'mpeg', 'wav', 'ogg', 'opus',
+                      'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg',
+                      'css', 'html', 'php', 'c', 'cpp', 'h', 'hpp', 'js', 'java', 'py',
+                      'txt', 'pdf', 'log',
+                      'webm', 'mpeg4', '3gpp', 'mov', 'avi', 'wmv', 'flv', 'ogg',
+                      'xls', 'xlsx', 'ppt', 'pptx', 'doc', 'docx', 'xps'];
+
         $request->validate([
             'files' => 'required|array|min:1',
-            'files.*' => ['bail', 'required', 'file', 'max:' . ($maxFileSize / 1024), new ValidateFileName()],
+            'files.*' => ['bail', 'required', 'file', \Illuminate\Validation\Rules\File::types($fileTypes) ,'max:' . ($maxFileSize / 1024), new ValidateFileName()],
+        ], [
+            'files.*.mimes' => 'The file must be a file of type: :values'
         ]);
 
         $files = $request->allFiles();
