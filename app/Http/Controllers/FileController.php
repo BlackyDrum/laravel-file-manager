@@ -20,7 +20,11 @@ class FileController extends Controller
             ->join('users', 'users.id', '=', 'owner_id')
             ->select([
                 'users.name AS username',
-                'files.*'
+                'files.identifier',
+                'files.name',
+                'files.size',
+                'files.owner_id',
+                'files.updated_at',
             ])
             ->get();
 
