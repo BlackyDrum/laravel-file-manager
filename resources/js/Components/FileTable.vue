@@ -33,16 +33,20 @@ const selectedFiles = ref([]);
 const files = ref();
 
 onMounted(() => {
+    updateFiles();
+})
+
+onUpdated(() => {
+    updateFiles();
+})
+
+const updateFiles = () => {
     files.value = page.props.files;
 
     for (let i = 0; i < files.value.length; i++) {
         files.value[i]['modified'] = `${calculateLastModified(files.value[i].updated_at)} days ago`;
     }
-})
-
-onUpdated(() => {
-    files.value = page.props.files;
-})
+}
 
 const calculateLastModified = (lastModified) => {
     const lastModifiedDate = new Date(lastModified);
