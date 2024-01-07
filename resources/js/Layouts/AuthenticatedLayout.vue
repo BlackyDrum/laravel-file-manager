@@ -70,6 +70,8 @@ const onSelectedFiles = (event) => {
 };
 
 const uploadEvent = () => {
+    if (fileForm.processing) return;
+
     fileForm.files = files.value;
 
     fileForm.post('/upload', {
@@ -116,13 +118,21 @@ const show = () => {
     }
 };
 
+const close = () => {
+    if (fileForm.processing) {
+        fileForm.cancel();
+    }
+
+    visible.value = false;
+}
+
 
 </script>
 
 <template>
 
     <div class="card flex justify-content-center">
-        <Toast position="bottom-right" group="headless" @close="visible = false">
+        <Toast position="bottom-right" group="headless" @close="close()">
             <template #container="{ message, closeCallback }">
                 <section class="grid grid-cols-[10%,90%] p-4 w-full bg-[#191919] shadow-2" style="border-radius: 10px">
                     <div>
@@ -312,9 +322,9 @@ const show = () => {
             <template #header="{ chooseCallback, uploadCallback, clearCallback, files }">
                 <div class="flex flex-wrap justify-content-between align-items-center flex-1 gap-2">
                     <div class="flex gap-2">
-                        <Button @click="chooseCallback()" icon="pi pi-images" rounded outlined></Button>
-                        <Button @click="uploadEvent()" icon="pi pi-cloud-upload" rounded outlined severity="success" :disabled="!files || files.length === 0"></Button>
-                        <Button @click="clearCallback(); fileForm.cancel();" icon="pi pi-times" rounded outlined severity="danger" :disabled="!files || files.length === 0"></Button>
+                        <Button @click="chooseCallback()" icon="pi pi-images" rounded outlined :disabled="fileForm.processing"></Button>
+                        <Button @click="uploadEvent()" icon="pi pi-cloud-upload" rounded outlined severity="success" :disabled="!files || files.length === 0 || fileForm.processing"></Button>
+                        <Button @click="clearCallback()" icon="pi pi-times" rounded outlined severity="danger" :disabled="!files || files.length === 0 || fileForm.processing"></Button>
                     </div>
                     <ProgressBar v-if="fileForm.progress" :value="fileForm.progress.percentage" :showValue="false" :class="['md:w-20rem h-1rem w-full md:ml-auto']"
                     ></ProgressBar>
@@ -330,7 +340,7 @@ const show = () => {
                             <span class="font-semibold self-center max-lg:break-all">{{ file.name }}</span>
                             <div class="self-center">{{ formatBytes(file.size) }}</div>
                             <Badge class="self-center max-lg:hidden" value="Pending" severity="warning" />
-                            <Button class="self-center" icon="pi pi-times" @click="onRemoveTemplatingFile(file, removeFileCallback, index)" outlined rounded  severity="danger" />
+                            <Button class="self-center" icon="pi pi-times" :disabled="fileForm.processing" @click="onRemoveTemplatingFile(file, removeFileCallback, index)" outlined rounded  severity="danger" />
                         </div>
                     </div>
                 </div>
