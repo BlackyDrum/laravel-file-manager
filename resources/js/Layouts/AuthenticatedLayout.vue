@@ -108,8 +108,8 @@ const handleFileUploadDialog = () => {
 
 <template>
     <Toast />
-    <div class="lg:grid lg:grid-cols-[15%,85%] gap-8 p-2 text-gray-700">
-        <nav>
+    <div class="lg:grid lg:grid-cols-[15%,85%] p-2 text-gray-700">
+        <nav class="mr-4">
             <div class="sidebar max-lg:hidden">
                 <div class="grid-rows-6">
                     <div class="flex">
@@ -212,7 +212,7 @@ const handleFileUploadDialog = () => {
             </div>
         </nav>
 
-        <div class="mt-8">
+        <div class="mt-8 ml-4">
             <div>
                 <div class="hidden lg:flex">
                     <div class="grow flex" v-if="$page.url !== '/profile'">
