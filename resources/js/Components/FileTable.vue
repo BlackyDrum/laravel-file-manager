@@ -141,7 +141,7 @@ const handleFileDownload = () => {
     </div>
     <div class="mt-4">
         <DataTable v-if="$page.props.files.length !== 0" :filters="filters" class="font-sans shadow-lg" v-model:selection="selectedFiles"
-                   :value="files" tableStyle="min-width: 50rem">
+                   :value="files" tableStyle="min-width: 50rem" scrollable scrollHeight="40rem">
             <Column selectionMode="multiple" :headerStyle="{background: tableHeadBackground}"></Column>
             <Column field="name" header="Name" sortable :headerStyle="{background: tableHeadBackground}"></Column>
             <Column field="owner_id" header="Owner" sortable :headerStyle="{background: tableHeadBackground}">
