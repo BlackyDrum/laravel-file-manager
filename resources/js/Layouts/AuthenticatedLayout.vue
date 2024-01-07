@@ -73,6 +73,9 @@ const uploadEvent = () => {
     fileForm.files = files.value;
 
     fileForm.post('/upload', {
+        onProgress: () => {
+            show();
+        },
         onError: (error) => {
             for (const e in error) {
                 toast.add({ severity: 'error', summary: 'Error', detail: error[e], life: 6000 });
@@ -80,7 +83,10 @@ const uploadEvent = () => {
         },
         onSuccess: (response) => {
             files.value.splice(0);
-            toast.add({ severity: 'success', summary: 'Success', detail: 'Files uploaded', life: 3000 });
+            //toast.add({ severity: 'success', summary: 'Success', detail: 'Files uploaded', life: 3000 });
+        },
+        onFinish: () => {
+            showFileUploadDialog.value = false;
         }
     })
 };
@@ -101,10 +107,48 @@ const handleFileUploadDialog = () => {
     showFileUploadDialog.value = !showFileUploadDialog.value;
 }
 
+const visible = ref(false);
+
+const show = () => {
+    if (!visible.value) {
+        toast.add({ severity: 'custom', summary: 'Uploading your files.', group: 'headless' });
+        visible.value = true;
+    }
+};
+
 
 </script>
 
 <template>
+
+    <div class="card flex justify-content-center">
+        <Toast position="bottom-right" group="headless" @close="visible = false">
+            <template #container="{ message, closeCallback }">
+                <section class="grid grid-cols-[10%,90%] p-4 w-full bg-[#191919] shadow-2" style="border-radius: 10px">
+                    <div>
+                        <i class="pi pi-cloud-upload text-[#3B81F4] text-2xl"></i>
+                    </div>
+                    <div class="text-white font-medium">
+                        <div>
+                            {{fileForm.progress.percentage === 100 ? 'Files uploaded' : 'Uploading your files'}}
+                        </div>
+                        <div class="mt-4">
+                            <ProgressBar :value="fileForm.progress.percentage" :showValue="false" :style="{ height: '4px' }"></ProgressBar>
+                            <div class="flex text-xs">
+                                <div class="ml-auto mr-2 mt-2 font-normal">
+                                    {{fileForm.progress.percentage}}% uploaded...
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 mb-3">
+                            <Button :label="fileForm.progress.percentage === 100 ? 'Close' : 'Cancel'" text class="text-white p-0 font-medium" @click="closeCallback"></Button>
+                        </div>
+                    </div>
+                </section>
+            </template>
+        </Toast>
+    </div>
+
     <Toast />
     <div class="lg:grid lg:grid-cols-[15%,85%] p-2 text-gray-700">
         <nav class="mr-4">
