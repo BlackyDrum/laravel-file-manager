@@ -2,7 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Files;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -29,11 +31,24 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $files = Files::query()->where('owner_id', '=', Auth::id())
+            ->join('users', 'users.id', '=', 'owner_id')
+            ->select([
+                'users.name AS username',
+                'files.identifier',
+                'files.name',
+                'files.size',
+                'files.owner_id',
+                'files.updated_at',
+            ])
+            ->get();
+
         return [
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user(),
-            ]
+            ],
+            'files' => $files
         ];
     }
 }

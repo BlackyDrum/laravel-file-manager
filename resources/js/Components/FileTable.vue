@@ -19,6 +19,8 @@ const page = usePage();
 const confirm = useConfirm();
 const toast = useToast();
 
+const maxFileSize = ref(import.meta.env.VITE_MAX_FILE_SIZE);
+
 const tableHeadBackground = ref("#DADADA");
 const selectedFiles = ref([]);
 const files = ref();
@@ -108,6 +110,16 @@ const handleFileDownload = () => {
     }
     else if (selectedFiles.value.length === 0) {
         toast.add({ severity: 'info', summary: 'Info', detail: 'You need to provide at least 1 file', life: 6000 });
+        return;
+    }
+
+    let totalSize = 0;
+    for (const file of selectedFiles.value) {
+        totalSize += file.size;
+    }
+
+    if (totalSize > maxFileSize.value) {
+        toast.add({ severity: 'info', summary: 'Info', detail: `Total size exceeds the limit of ${Math.floor(maxFileSize.value / 1024 / 1024)}MB`, life: 6000 });
         return;
     }
 

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import {computed, onMounted, onUpdated, ref, watch, defineEmits} from 'vue';
 import {router, usePage, useForm} from "@inertiajs/vue3";
 
@@ -29,9 +29,9 @@ const filterInput = ref(null);
 
 const files = ref([]);
 const maxFileSize = ref(import.meta.env.VITE_MAX_FILE_SIZE);
-const fileForm = useForm({
-    files: files.value
-});
+const uploadPercentage = ref(0);
+const uploadProcessing = ref(false);
+let cancelSource = null;
 
 const fileTypes = ref(['zip', 'tar', 'rar', 'gzip', '7z',
     'mp3', 'mp4', 'mpeg', 'wav', 'ogg', 'opus',
@@ -58,7 +58,7 @@ const menuItems = ref([
 
 const onRemoveTemplatingFile = (file, removeFileCallback, index) => {
     files.value.splice(index, 1)
-    fileForm.cancel();
+    cancelSource.cancel();
 };
 
 const onSelectedFiles = (event) => {
@@ -70,36 +70,62 @@ const onSelectedFiles = (event) => {
 };
 
 const uploadEvent = () => {
-    if (fileForm.processing) return;
+    if (uploadProcessing.value) return;
+
+    if (files.value.length === 0) {
+        toast.add({ severity: 'info', summary: 'Info', detail: 'You need to provide at least 1 file', life: 6000 });
+        return;
+    }
+    if (files.value.length > 10) {
+        toast.add({ severity: 'info', summary: 'Info', detail: 'You can only upload 10 files at once', life: 6000 });
+        return;
+    }
 
     for (const userFile of page.props.files) {
         for (const file of files.value) {
+            if (file.name.length > 64) {
+                toast.add({ severity: 'info', summary: 'Info', detail: 'The filename cannot not be greater than 64 characters', life: 6000 });
+                return;
+            }
             if (userFile.name === file.name) {
-                toast.add({ severity: 'error', summary: 'Error', detail: `You already have a file with the name ${file.name}`, life: 6000 });
+                toast.add({ severity: 'info', summary: 'Info', detail: `You already have a file with the name ${file.name}`, life: 6000 });
                 return;
             }
         }
     }
 
-    fileForm.files = files.value;
+    let filesForm = new FormData();
+    for (let i = 0; i < files.value.length; i++) {
+        filesForm.append('files[]', files.value[i]);
+    }
 
-    fileForm.post('/upload', {
-        onProgress: () => {
-            show();
+    uploadProcessing.value = true;
+
+    show();
+
+    cancelSource = window.axios.CancelToken.source("Upload canceled");
+
+    window.axios.post('/upload', filesForm, {
+        onUploadProgress: e => {
+            uploadPercentage.value = Math.round((e.loaded * 100) / e.total);
         },
-        onError: (error) => {
-            for (const e in error) {
-                toast.add({ severity: 'error', summary: 'Error', detail: error[e], life: 6000 });
-            }
-        },
-        onSuccess: (response) => {
-            files.value.splice(0);
-            //toast.add({ severity: 'success', summary: 'Success', detail: 'Files uploaded', life: 3000 });
-        },
-        onFinish: () => {
-            showFileUploadDialog.value = false;
-        }
+        cancelToken: cancelSource.token,
     })
+        .then(response => {
+            router.reload();
+        })
+        .catch(error => {
+            if (window.axios.isCancel(error)) {
+                toast.add({ severity: 'info', summary: 'Info', detail: "Upload canceled", life: 3000 });
+            }
+            else {
+                toast.add({ severity: 'error', summary: 'Error', detail: error.response.data.message, life: 6000 });
+            }
+        })
+        .finally(() => {
+            showFileUploadDialog.value = false;
+            uploadProcessing.value = false;
+        })
 };
 
 const formatBytes = (bytes, decimals = 2) => {
@@ -128,8 +154,8 @@ const show = () => {
 };
 
 const close = () => {
-    if (fileForm.processing) {
-        fileForm.cancel();
+    if (uploadProcessing.value) {
+        cancelSource.cancel();
     }
 
     visible.value = false;
@@ -149,18 +175,18 @@ const close = () => {
                     </div>
                     <div class="text-white font-medium">
                         <div>
-                            {{fileForm.progress.percentage === 100 ? 'Files uploaded' : 'Uploading your files'}}
+                            {{uploadPercentage === 100 ? 'Files uploaded' : 'Uploading your files'}}
                         </div>
                         <div class="mt-4">
-                            <ProgressBar :value="fileForm.progress.percentage" :showValue="false" :style="{ height: '4px' }"></ProgressBar>
+                            <ProgressBar :value="uploadPercentage" :showValue="false" :style="{ height: '4px' }"></ProgressBar>
                             <div class="flex text-xs">
                                 <div class="ml-auto mr-2 mt-2 font-normal">
-                                    {{fileForm.progress.percentage}}% uploaded...
+                                    {{uploadPercentage}}% uploaded...
                                 </div>
                             </div>
                         </div>
                         <div class="flex gap-3 mb-3">
-                            <Button :label="fileForm.progress.percentage === 100 ? 'Close' : 'Cancel'" text class="text-white p-0 font-medium" @click="closeCallback"></Button>
+                            <Button :label="uploadPercentage === 100 ? 'Close' : 'Cancel'" text class="text-white p-0 font-medium" @click="closeCallback"></Button>
                         </div>
                     </div>
                 </section>
@@ -331,11 +357,11 @@ const close = () => {
             <template #header="{ chooseCallback, uploadCallback, clearCallback, files }">
                 <div class="flex flex-wrap justify-content-between align-items-center flex-1 gap-2">
                     <div class="flex gap-2">
-                        <Button @click="chooseCallback()" icon="pi pi-images" rounded outlined :disabled="fileForm.processing"></Button>
-                        <Button @click="uploadEvent()" icon="pi pi-cloud-upload" rounded outlined severity="success" :disabled="!files || files.length === 0 || fileForm.processing"></Button>
-                        <Button @click="clearCallback()" icon="pi pi-times" rounded outlined severity="danger" :disabled="!files || files.length === 0 || fileForm.processing"></Button>
+                        <Button @click="chooseCallback()" icon="pi pi-images" rounded outlined :disabled="uploadProcessing"></Button>
+                        <Button @click="uploadEvent()" icon="pi pi-cloud-upload" rounded outlined severity="success" :disabled="!files || files.length === 0 || uploadProcessing"></Button>
+                        <Button @click="clearCallback()" icon="pi pi-times" rounded outlined severity="danger" :disabled="!files || files.length === 0 || uploadProcessing"></Button>
                     </div>
-                    <ProgressBar v-if="fileForm.progress" :value="fileForm.progress.percentage" :showValue="false" :class="['md:w-20rem h-1rem w-full md:ml-auto']"
+                    <ProgressBar v-if="uploadProcessing" :value="uploadPercentage" :showValue="false" :class="['md:w-20rem h-1rem w-full md:ml-auto']"
                     ></ProgressBar>
                 </div>
             </template>
@@ -349,7 +375,7 @@ const close = () => {
                             <span class="font-semibold self-center max-lg:break-all">{{ file.name }}</span>
                             <div class="self-center">{{ formatBytes(file.size) }}</div>
                             <Badge class="self-center max-lg:hidden" value="Pending" severity="warning" />
-                            <Button class="self-center" icon="pi pi-times" :disabled="fileForm.processing" @click="onRemoveTemplatingFile(file, removeFileCallback, index)" outlined rounded  severity="danger" />
+                            <Button class="self-center" icon="pi pi-times" :disabled="uploadProcessing" @click="onRemoveTemplatingFile(file, removeFileCallback, index)" outlined rounded  severity="danger" />
                         </div>
                     </div>
                 </div>

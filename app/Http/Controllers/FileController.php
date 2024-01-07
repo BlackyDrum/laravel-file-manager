@@ -17,21 +17,7 @@ class FileController extends Controller
 {
     public function dashboard(Request $request)
     {
-        $files = Files::query()->where('owner_id', '=', Auth::id())
-            ->join('users', 'users.id', '=', 'owner_id')
-            ->select([
-                'users.name AS username',
-                'files.identifier',
-                'files.name',
-                'files.size',
-                'files.owner_id',
-                'files.updated_at',
-            ])
-            ->get();
-
-        return Inertia::render('Dashboard', [
-            'files' => $files,
-        ]);
+        return Inertia::render('Dashboard');
     }
 
     public function upload(Request $request)
@@ -96,6 +82,16 @@ class FileController extends Controller
         ]);
 
         $files = $request->input('files');
+
+        $totalSize = 0;
+        foreach ($files as $file) {
+            $filesize = Files::query()->where('identifier', '=', $file['identifier'])->first()->size;
+            $totalSize += $filesize;
+        }
+
+        if ($totalSize >  env('MAX_FILE_SIZE')) {
+            abort(422, 'Total size exceeds limit');
+        }
 
         $filesPath = storage_path() . '/app/user_uploads/' . Auth::id() . '/';
 
