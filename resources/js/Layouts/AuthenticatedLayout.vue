@@ -72,6 +72,15 @@ const onSelectedFiles = (event) => {
 const uploadEvent = () => {
     if (fileForm.processing) return;
 
+    for (const userFile of page.props.files) {
+        for (const file of files.value) {
+            if (userFile.name === file.name) {
+                toast.add({ severity: 'error', summary: 'Error', detail: `You already have a file with the name ${file.name}`, life: 6000 });
+                return;
+            }
+        }
+    }
+
     fileForm.files = files.value;
 
     fileForm.post('/upload', {
