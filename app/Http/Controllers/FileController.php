@@ -98,6 +98,10 @@ class FileController extends Controller
 
         $filesPath = storage_path() . '/app/user_uploads/' . Auth::id() . '/';
 
+        if (!file_exists(storage_path() . '/app/tmp')) {
+            mkdir(storage_path() . '/app/tmp');
+        }
+
         $zip = new \ZipArchive();
         $zipPath = '/tmp/' . Auth::id() . '.zip';
 
