@@ -18,7 +18,9 @@ class ValidateFileName implements ValidationRule
     {
         $filename = $value->getClientOriginalName();
 
-        if (strlen($filename) > 64) {
+        $maxFileNameSize = intval(env('MAX_FILE_NAME_SIZE'));
+
+        if (strlen($filename) > $maxFileNameSize) {
             $fail('The filename cannot not be greater than 64 characters');
         }
 

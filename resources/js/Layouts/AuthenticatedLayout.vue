@@ -29,6 +29,8 @@ const filterInput = ref(null);
 
 const files = ref([]);
 const maxFileSize = ref(import.meta.env.VITE_MAX_FILE_SIZE);
+const maxFileUploadCount = import.meta.env.VITE_MAX_FILE_UPLOAD_COUNT;
+const maxFileNameSize = import.meta.env.VITE_MAX_FILE_NAME_SIZE;
 const uploadPercentage = ref(0);
 const uploadProcessing = ref(false);
 let cancelSource = null;
@@ -54,8 +56,6 @@ const menuItems = ref([
     { label: "Dashboard", url: "dashboard" },
 ]);
 
-
-
 const onRemoveTemplatingFile = (file, removeFileCallback, index) => {
     files.value.splice(index, 1)
     if (uploadProcessing.value) {
@@ -78,15 +78,15 @@ const uploadEvent = () => {
         toast.add({ severity: 'info', summary: 'Info', detail: 'You need to provide at least 1 file', life: 6000 });
         return;
     }
-    if (files.value.length > 10) {
-        toast.add({ severity: 'info', summary: 'Info', detail: 'You can only upload 10 files at once', life: 6000 });
+    if (files.value.length > maxFileUploadCount) {
+        toast.add({ severity: 'info', summary: 'Info', detail: `You can only upload ${maxFileUploadCount} files at once`, life: 6000 });
         return;
     }
 
     for (const userFile of page.props.files) {
         for (const file of files.value) {
-            if (file.name.length > 64) {
-                toast.add({ severity: 'info', summary: 'Info', detail: 'The filename cannot not be greater than 64 characters', life: 6000 });
+            if (file.name.length > maxFileNameSize) {
+                toast.add({ severity: 'info', summary: 'Info', detail: `The filename cannot not be greater than ${maxFileNameSize} characters`, life: 6000 });
                 return;
             }
             if (userFile.name === file.name) {

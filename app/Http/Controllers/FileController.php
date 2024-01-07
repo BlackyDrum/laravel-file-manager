@@ -23,6 +23,7 @@ class FileController extends Controller
     public function upload(Request $request)
     {
         $maxFileSize = intval(env('MAX_FILE_SIZE'));
+        $maxFileUploadCount = intval(env('MAX_FILE_UPLOAD_COUNT'));
 
         $fileTypes = ['zip', 'tar', 'rar', 'gzip', '7z',
                       'mp3', 'mp4', 'mpeg', 'wav', 'ogg', 'opus',
@@ -33,13 +34,13 @@ class FileController extends Controller
                       'xls', 'xlsx', 'ppt', 'pptx', 'doc', 'docx', 'xps'];
 
         $request->validate([
-            'files' => 'required|array|min:1|max:10',
+            'files' => 'required|array|min:1|max:' . $maxFileUploadCount,
             'files.*' => ['bail', 'required', 'file', \Illuminate\Validation\Rules\File::types($fileTypes) ,'max:' . ($maxFileSize / 1024), new ValidateFileName()],
         ], [
             'files.required' => 'You need to provide at least 1 file',
             'files.array' => 'You need to provide at least 1 file',
             'files.min' => 'You need to provide at least 1 file',
-            'files.max' => 'You can only upload 10 files at once',
+            'files.max' => "You can only upload $maxFileUploadCount files at once",
             'files.*.mimes' => 'The file must be a file of type: :values',
             'files.*.required' => 'Invalid file',
             'files.*.file' => 'Invalid file',

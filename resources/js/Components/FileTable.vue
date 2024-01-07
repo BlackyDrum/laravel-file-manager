@@ -20,6 +20,7 @@ const confirm = useConfirm();
 const toast = useToast();
 
 const maxFileSize = ref(import.meta.env.VITE_MAX_FILE_SIZE);
+const maxFileDownloadCount = import.meta.env.VITE_MAX_FILE_DOWNLOAD_COUNT;
 
 const tableHeadBackground = ref("#DADADA");
 const selectedFiles = ref([]);
@@ -104,8 +105,8 @@ const confirmFileDeletion = () => {
 const handleFileDownload = () => {
     if (isDownloading.value) return;
 
-    if (selectedFiles.value.length > 10) {
-        toast.add({ severity: 'info', summary: 'Info', detail: 'You can only download 10 files at once', life: 6000 });
+    if (selectedFiles.value.length > maxFileDownloadCount) {
+        toast.add({ severity: 'info', summary: 'Info', detail: `You can only download ${maxFileDownloadCount} files at once`, life: 6000 });
         return;
     }
     else if (selectedFiles.value.length === 0) {
