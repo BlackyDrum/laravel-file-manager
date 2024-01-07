@@ -138,7 +138,6 @@ const handleFileDownload = () => {
 
 <template>
     <ConfirmDialog />
-    <Toast />
     <div class="flex">
         <div v-if="$page.props.files.length !== 0" class="flex gap-3 ml-auto">
             <Button class="text-black border-gray-300 bg-white font-medium" :class="{'cursor-not-allowed' : selectedFiles.length === 0}" label="Share" icon="pi pi-share-alt" />
