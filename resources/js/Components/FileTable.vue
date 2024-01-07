@@ -28,7 +28,10 @@ const selectedFiles = ref([]);
 const files = ref();
 const isDownloading = ref(false);
 const isDeleting = ref(false);
-const isRenaming = ref(false);
+const isRenaming = ref({
+    status: false,
+    identifier: '',
+});
 
 const filters = ref({
     'global': {value: null, matchMode: 'contains'},
@@ -166,7 +169,8 @@ const renameFile = e => {
 
     const identifier = data.identifier;
 
-    isRenaming.value = true;
+    isRenaming.value.status = true;
+    isRenaming.value.identifier = identifier;
 
     window.axios.patch('/files/rename', {
         identifier: identifier,
@@ -184,7 +188,8 @@ const renameFile = e => {
             toast.add({ severity: 'error', summary: 'Error', detail: error.response.data.message, life: 6000 });
         })
         .finally(() => {
-            isRenaming.value = false;
+            isRenaming.value.status = false;
+            isRenaming.value.identifier = '';
         })
 }
 
@@ -203,14 +208,14 @@ const renameFile = e => {
         <DataTable v-if="$page.props.files.length !== 0" :filters="filters" class="font-sans shadow-lg" v-model:selection="selectedFiles"
                    :value="files" tableStyle="min-width: 50rem" scrollable scrollHeight="40rem" editMode="cell" @cell-edit-complete="renameFile">
             <Column selectionMode="multiple" :headerStyle="{background: tableHeadBackground}"></Column>
-            <Column v-if="isRenaming" :headerStyle="{background: tableHeadBackground}">
-                <template #body>
-                    <i class="pi pi-spin pi-spinner" />
+            <Column class="w-1" v-if="isRenaming.status" :headerStyle="{background: tableHeadBackground}">
+                <template #body="{data}">
+                    <i v-if="data.identifier === isRenaming.identifier" class="pi pi-spin pi-spinner" />
                 </template>
             </Column>
             <Column field="name" header="Name" sortable :headerStyle="{background: tableHeadBackground}">
                 <template #editor="{ data, field }">
-                    <InputText class="w-full" :disabled="isRenaming" v-model="data[field]" autofocus />
+                    <InputText class="w-full" :disabled="isRenaming.status" v-model="data[field]" autofocus />
                 </template>
             </Column>
             <Column field="owner_id" header="Owner" sortable :headerStyle="{background: tableHeadBackground}">
