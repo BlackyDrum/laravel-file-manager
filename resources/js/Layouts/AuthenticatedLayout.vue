@@ -209,6 +209,9 @@ const handleFileUploadDialog = () => {
                         </ResponsiveNavLink>
                     </div>
                 </div>
+                <div class="p-2">
+                    <Button class="w-full" label="Add File" icon="pi pi-plus" @click="handleFileUploadDialog" />
+                </div>
             </div>
         </nav>
 
@@ -282,9 +285,9 @@ const handleFileUploadDialog = () => {
                             <div class="self-center">
                                 <img role="presentation" :alt="file.name" :src="file.objectURL" width="100" height="50" class="shadow-2" />
                             </div>
-                            <span class="font-semibold self-center">{{ file.name }}</span>
+                            <span class="font-semibold self-center max-lg:break-all">{{ file.name }}</span>
                             <div class="self-center">{{ formatBytes(file.size) }}</div>
-                            <Badge class="self-center" value="Pending" severity="warning" />
+                            <Badge class="self-center max-lg:hidden" value="Pending" severity="warning" />
                             <Button class="self-center" icon="pi pi-times" @click="onRemoveTemplatingFile(file, removeFileCallback, index)" outlined rounded  severity="danger" />
                         </div>
                     </div>
