@@ -164,6 +164,9 @@ class FileController extends Controller
                 }),
             ]
         ], [
+            'identifier.required' => 'Invalid file',
+            'identifier.string' => 'Invalid file',
+            'identifier.exists' => 'Invalid file',
             'filename.unique' => 'You already have a file with the name ' . $request->input('filename')
         ]);
 
