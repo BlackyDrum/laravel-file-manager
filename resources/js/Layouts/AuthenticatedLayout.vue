@@ -113,11 +113,15 @@ const uploadEvent = () => {
     for (const userFile of page.props.files) {
         for (const file of files.value) {
             if (file.name.length > maxFileNameSize) {
-                toast.add({ severity: 'info', summary: 'Info', detail: `The filename cannot not be greater than ${maxFileNameSize} characters`, life: 6000 });
+                toast.add({ severity: 'info', summary: 'Info', detail: `The filename cannot be greater than ${maxFileNameSize} characters`, life: 6000 });
                 return;
             }
             if (userFile.name === file.name) {
                 toast.add({ severity: 'info', summary: 'Info', detail: `You already have a file with the name ${file.name}`, life: 6000 });
+                return;
+            }
+            if (file.size > maxFileSize.value) {
+                toast.add({ severity: 'info', summary: 'Info', detail: `File Size exceeds the limit of ${Math.floor(maxFileSize.value / 1024 / 1024)}MB`, life: 6000 });
                 return;
             }
         }
