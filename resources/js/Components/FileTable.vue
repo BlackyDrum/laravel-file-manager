@@ -66,7 +66,10 @@ const formatBytes = (bytes, decimals = 2) => {
 }
 
 const confirmFileDeletion = () => {
-    if (selectedFiles.value.length === 0) return;
+    if (selectedFiles.value.length === 0) {
+        toast.add({ severity: 'info', summary: 'Info', detail: 'You need to provide at least 1 file', life: 6000 });
+        return;
+    }
 
     confirm.require({
         message: 'Do you want to delete the selected files?',
@@ -99,6 +102,10 @@ const confirmFileDeletion = () => {
 const handleFileDownload = () => {
     if (selectedFiles.value.length > 10) {
         toast.add({ severity: 'info', summary: 'Info', detail: 'You can only download 10 files at once', life: 6000 });
+        return;
+    }
+    else if (selectedFiles.value.length === 0) {
+        toast.add({ severity: 'info', summary: 'Info', detail: 'You need to provide at least 1 file', life: 6000 });
         return;
     }
 
@@ -134,9 +141,9 @@ const handleFileDownload = () => {
     <Toast />
     <div class="flex">
         <div v-if="$page.props.files.length !== 0" class="flex gap-3 ml-auto">
-            <Button class="text-black border-gray-300 bg-white font-medium" label="Share" icon="pi pi-share-alt" :disabled="selectedFiles.length === 0" />
-            <Button class="font-medium" label="Download" :icon="isDownloading ? 'pi pi-spin pi-spinner' : 'pi pi-download'" :disabled="selectedFiles.length === 0" @click="handleFileDownload" />
-            <Button class="text-black border-gray-300 bg-white font-medium" label="Delete" icon="pi pi-trash" :disabled="selectedFiles.length === 0" @click="confirmFileDeletion" />
+            <Button class="text-black border-gray-300 bg-white font-medium" :class="{'cursor-not-allowed' : selectedFiles.length === 0}" label="Share" icon="pi pi-share-alt" />
+            <Button class="font-medium" :class="{'cursor-not-allowed' : selectedFiles.length === 0}" label="Download" :icon="isDownloading ? 'pi pi-spin pi-spinner' : 'pi pi-download'" @click="handleFileDownload" />
+            <Button class="text-black border-gray-300 bg-white font-medium" :class="{'cursor-not-allowed' : selectedFiles.length === 0}" label="Delete" icon="pi pi-trash" @click="confirmFileDeletion" />
         </div>
     </div>
     <div class="mt-4">
