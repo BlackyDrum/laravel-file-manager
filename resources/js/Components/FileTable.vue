@@ -9,6 +9,7 @@ import Button from 'primevue/button';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import ConfirmDialog from 'primevue/confirmdialog';
+import InputText from 'primevue/InputText';
 import Toast from 'primevue/toast';
 import {FilterMatchMode} from "primevue/api";
 
@@ -27,6 +28,7 @@ const selectedFiles = ref([]);
 const files = ref();
 const isDownloading = ref(false);
 const isDeleting = ref(false);
+const isRenaming = ref(false);
 
 const filters = ref({
     'global': {value: null, matchMode: 'contains'},
@@ -155,6 +157,37 @@ const handleFileDownload = () => {
         });
 };
 
+const renameFile = e => {
+    let { data, newValue } = e;
+
+    if (data.name === newValue) {
+        return;
+    }
+
+    const identifier = data.identifier;
+
+    isRenaming.value = true;
+
+    window.axios.patch('/files/rename', {
+        identifier: identifier,
+        filename: newValue
+    })
+        .then(response => {
+            for (let i = 0; i < files.value.length; i++) {
+                if (files.value[i].identifier === response.data.id) {
+                    files.value[i].name = response.data.name;
+                    break;
+                }
+            }
+        })
+        .catch(error => {
+            toast.add({ severity: 'error', summary: 'Error', detail: error.response.data.message, life: 6000 });
+        })
+        .finally(() => {
+            isRenaming.value = false;
+        })
+}
+
 </script>
 
 <template>
@@ -168,9 +201,18 @@ const handleFileDownload = () => {
     </div>
     <div class="mt-4">
         <DataTable v-if="$page.props.files.length !== 0" :filters="filters" class="font-sans shadow-lg" v-model:selection="selectedFiles"
-                   :value="files" tableStyle="min-width: 50rem" scrollable scrollHeight="40rem">
+                   :value="files" tableStyle="min-width: 50rem" scrollable scrollHeight="40rem" editMode="cell" @cell-edit-complete="renameFile">
             <Column selectionMode="multiple" :headerStyle="{background: tableHeadBackground}"></Column>
-            <Column field="name" header="Name" sortable :headerStyle="{background: tableHeadBackground}"></Column>
+            <Column v-if="isRenaming" :headerStyle="{background: tableHeadBackground}">
+                <template #body>
+                    <i class="pi pi-spin pi-spinner" />
+                </template>
+            </Column>
+            <Column field="name" header="Name" sortable :headerStyle="{background: tableHeadBackground}">
+                <template #editor="{ data, field }">
+                    <InputText class="w-full" :disabled="isRenaming" v-model="data[field]" autofocus />
+                </template>
+            </Column>
             <Column field="owner_id" header="Owner" sortable :headerStyle="{background: tableHeadBackground}">
                 <template #body="{data, field}">
                     {{data["username"]}} {{data[field] === $page.props.auth.user.id ? '(me)' : data[field]}}

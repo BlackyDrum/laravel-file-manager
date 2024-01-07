@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use \Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use const http\Client\Curl\AUTH_ANY;
 
@@ -151,5 +152,26 @@ class FileController extends Controller
         }
 
         return \response()->json(['message' => "Deleted $deleteCount files"]);
+    }
+
+    public function rename(Request $request)
+    {
+        $request->validate([
+            'identifier' => ['bail', 'required', 'string', 'exists:files,identifier', new ValidateFileOwner()],
+            'filename' => ['bail', 'required', 'string', 'max:' . env('MAX_FILE_NAME_SIZE'),
+                Rule::unique('files', 'name')->where(function ($query) use ($request) {
+                    return $query->where('owner_id', Auth::id());
+                }),
+            ]
+        ], [
+            'filename.unique' => 'You already have a file with the name ' . $request->input('filename')
+        ]);
+
+        Files::query()->where('identifier', '=', $request->input('identifier'))
+            ->update([
+                'name' => $request->input('filename')
+            ]);
+
+        return \response()->json(['id' => $request->input('identifier'), 'name' => $request->input('filename')]);
     }
 }

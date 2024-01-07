@@ -19,7 +19,7 @@ class ValidateFileOwner implements ValidationRule
         $file = Files::query()->where('identifier', '=', $value)->first();
 
         if ($file->owner_id != Auth::id()) {
-            $fail('You cannot delete this file');
+            $fail('You cannot access this file');
         }
     }
 }
