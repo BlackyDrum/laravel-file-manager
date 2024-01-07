@@ -58,7 +58,9 @@ const menuItems = ref([
 
 const onRemoveTemplatingFile = (file, removeFileCallback, index) => {
     files.value.splice(index, 1)
-    cancelSource.cancel();
+    if (uploadProcessing.value) {
+        cancelSource.cancel();
+    }
 };
 
 const onSelectedFiles = (event) => {
@@ -118,8 +120,11 @@ const uploadEvent = () => {
             if (window.axios.isCancel(error)) {
                 toast.add({ severity: 'info', summary: 'Info', detail: "Upload canceled", life: 3000 });
             }
-            else {
+            else if (error.response) {
                 toast.add({ severity: 'error', summary: 'Error', detail: error.response.data.message, life: 6000 });
+            }
+            else {
+                toast.add({ severity: 'error', summary: 'Error', detail: error.message, life: 6000 });
             }
         })
         .finally(() => {
@@ -159,6 +164,7 @@ const close = () => {
     }
 
     visible.value = false;
+    uploadPercentage.value = 0;
 }
 
 
