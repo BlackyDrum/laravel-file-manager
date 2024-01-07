@@ -217,7 +217,7 @@ const handleFileUploadDialog = () => {
             <div>
                 <div class="hidden lg:flex">
                     <div class="grow flex" v-if="$page.url !== '/profile'">
-                        <InputText class="rounded-lg w-3/4 p-3 font-medium" :disabled="page.props.files.length === 0" v-model="filterInput" @input="emit('filterInput', filterInput)" placeholder="Search for files" />
+                        <InputText v-if="$page.props.files.length !== 0" class="rounded-lg w-3/4 p-3 font-medium" v-model="filterInput" @input="emit('filterInput', filterInput)" placeholder="Search for files" />
                     </div>
                     <!-- Settings Dropdown -->
                     <div class="relative ml-auto mr-10 self-center">
