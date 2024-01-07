@@ -1,5 +1,5 @@
 <script setup>
-import {computed, onMounted, onUpdated, ref, watch, defineEmits} from 'vue';
+import {computed, onMounted, onUpdated, ref, watch, defineEmits, onBeforeUnmount} from 'vue';
 import {router, usePage, useForm} from "@inertiajs/vue3";
 
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
@@ -55,6 +55,33 @@ const getFileTypes = computed(() => {
 const menuItems = ref([
     { label: "Dashboard", url: "dashboard" },
 ]);
+
+onMounted(() => {
+    document.addEventListener('dragover', (e) => {
+        e.preventDefault();
+    })
+    document.addEventListener('drop', handleFileDrop);
+})
+
+onBeforeUnmount(() => {
+    document.removeEventListener('dragover', (e) => {
+        e.preventDefault();
+    });
+    document.removeEventListener('drop', handleFileDrop);
+})
+
+const handleFileDrop = (e) => {
+    e.preventDefault();
+    const droppedFiles = e.dataTransfer.files;
+
+    for (const file of droppedFiles) {
+        files.value.push(file);
+    }
+
+    uploadEvent();
+
+    files.value.splice(0);
+}
 
 const onRemoveTemplatingFile = (file, removeFileCallback, index) => {
     files.value.splice(index, 1)
@@ -114,6 +141,7 @@ const uploadEvent = () => {
         cancelToken: cancelSource.token,
     })
         .then(response => {
+            files.value.splice(0);
             router.reload();
         })
         .catch(error => {
@@ -171,7 +199,6 @@ const close = () => {
 </script>
 
 <template>
-
     <div class="card flex justify-content-center">
         <Toast position="bottom-right" group="headless" class="max-lg:w-[22rem]" @close="close()">
             <template #container="{ message, closeCallback }">
