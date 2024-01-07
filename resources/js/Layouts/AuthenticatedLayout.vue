@@ -173,7 +173,7 @@ const close = () => {
 <template>
 
     <div class="card flex justify-content-center">
-        <Toast position="bottom-right" group="headless" @close="close()">
+        <Toast position="bottom-right" group="headless" class="max-lg:w-[22rem]" @close="close()">
             <template #container="{ message, closeCallback }">
                 <section class="grid grid-cols-[10%,90%] p-4 w-full bg-[#191919] shadow-2" style="border-radius: 10px">
                     <div>
@@ -201,7 +201,7 @@ const close = () => {
         </Toast>
     </div>
 
-    <Toast />
+    <Toast class="max-lg:w-[22rem]"/>
     <div class="lg:grid lg:grid-cols-[15%,85%] p-2 text-gray-700">
         <nav class="mr-4">
             <div class="sidebar max-lg:hidden">
