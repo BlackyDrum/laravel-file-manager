@@ -181,7 +181,8 @@ const close = () => {
                             <ProgressBar :value="uploadPercentage" :showValue="false" :style="{ height: '4px' }"></ProgressBar>
                             <div class="flex text-xs">
                                 <div class="ml-auto mr-2 mt-2 font-normal">
-                                    {{uploadPercentage}}% uploaded...
+                                    <span v-if="uploadPercentage !== 100">{{uploadPercentage}}% uploaded...</span>
+                                    <span v-else>Finished</span>
                                 </div>
                             </div>
                         </div>
