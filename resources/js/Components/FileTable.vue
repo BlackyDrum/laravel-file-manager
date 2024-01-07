@@ -180,6 +180,7 @@ const renameFile = e => {
             for (let i = 0; i < files.value.length; i++) {
                 if (files.value[i].identifier === response.data.id) {
                     files.value[i].name = response.data.name;
+                    files.value[i]['modified'] = `0 days ago`;
                     break;
                 }
             }
