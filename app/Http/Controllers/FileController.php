@@ -71,14 +71,16 @@ class FileController extends Controller
 
     public function download(Request $request)
     {
+        $maxFileDownloadCount = env('MAX_FILE_DOWNLOAD_COUNT');
+
         $request->validate([
-            'files' => 'required|array|min:1|max:10',
+            'files' => 'required|array|min:1|max:' . $maxFileDownloadCount,
             'files.*.identifier' => ['bail', 'required', 'string', 'exists:files,identifier', new ValidateFileOwner()]
         ], [
             'files.required' => 'You need to provide at least 1 file',
             'files.array' => 'You need to provide at least 1 file',
             'files.min' => 'You need to provide at least 1 file',
-            'files.max' => 'You can only download 10 files at once',
+            'files.max' => "You can only download $maxFileDownloadCount files at once",
             'files.*.identifier.*' => 'Invalid file'
         ]);
 
