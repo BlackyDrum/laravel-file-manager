@@ -48,6 +48,10 @@ class FileController extends Controller
 
         $files = $request->allFiles();
 
+        if (!is_dir(storage_path() . '/app/user_uploads')) {
+            mkdir(storage_path() . '/app/user_uploads');
+        }
+
         $path = storage_path() . '/app/user_uploads/' . Auth::id();
         if (!is_dir($path)) {
             mkdir($path);
