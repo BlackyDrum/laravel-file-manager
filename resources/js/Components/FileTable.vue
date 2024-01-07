@@ -26,6 +26,7 @@ const tableHeadBackground = ref("#DADADA");
 const selectedFiles = ref([]);
 const files = ref();
 const isDownloading = ref(false);
+const isDeleting = ref(false);
 
 const filters = ref({
     'global': {value: null, matchMode: 'contains'},
@@ -74,6 +75,8 @@ const confirmFileDeletion = () => {
         return;
     }
 
+    isDeleting.value = true;
+
     confirm.require({
         message: 'Do you want to delete the selected files?',
         header: 'Delete Confirmation',
@@ -94,6 +97,9 @@ const confirmFileDeletion = () => {
                 })
                 .catch(error => {
                     toast.add({ severity: 'error', summary: 'Error', detail: error.response.data.message, life: 6000 });
+                })
+                .finally(() => {
+                    isDeleting.value = false;
                 })
         },
         reject: () => {
@@ -157,7 +163,7 @@ const handleFileDownload = () => {
         <div v-if="$page.props.files.length !== 0" class="flex gap-3 ml-auto">
             <Button class="text-black border-gray-300 bg-white font-medium" :class="{'cursor-not-allowed' : selectedFiles.length === 0}" label="Share" icon="pi pi-share-alt" />
             <Button class="font-medium" :class="{'cursor-not-allowed' : selectedFiles.length === 0}" label="Download" :icon="isDownloading ? 'pi pi-spin pi-spinner' : 'pi pi-download'" @click="handleFileDownload" />
-            <Button class="text-black border-gray-300 bg-white font-medium" :class="{'cursor-not-allowed' : selectedFiles.length === 0}" label="Delete" icon="pi pi-trash" @click="confirmFileDeletion" />
+            <Button class="text-black border-gray-300 bg-white font-medium" :class="{'cursor-not-allowed' : selectedFiles.length === 0}" label="Delete" :icon="isDeleting ? 'pi pi-spin pi-spinner' : 'pi pi-trash'" @click="confirmFileDeletion" />
         </div>
     </div>
     <div class="mt-4">
