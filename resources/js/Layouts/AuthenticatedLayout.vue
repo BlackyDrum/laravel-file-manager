@@ -52,8 +52,6 @@ const getFileTypes = computed(() => {
 
 const menuItems = ref([
     { label: "Dashboard", url: "dashboard" },
-    { label: "Shared with me", url: "shared-with-me" },
-    { label: "Shared by me", url: "shared-by-me" },
 ]);
 
 

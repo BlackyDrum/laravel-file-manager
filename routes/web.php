@@ -31,13 +31,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/files', [\App\Http\Controllers\FileController::class, 'delete'])->name('delete');
 
     Route::get('/dashboard', [\App\Http\Controllers\FileController::class, 'dashboard'])->name('dashboard');
-
-    Route::get('/shared-with-me', function () {
-        return null;
-    })->name('shared-with-me');
-    Route::get('/shared-by-me', function () {
-        return null;
-    })->name('shared-by-me');
 });
 
 require __DIR__.'/auth.php';
