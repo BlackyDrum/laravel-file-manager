@@ -181,6 +181,7 @@ const handleFileShare = () => {
     })
         .then(response => {
             toast.add({ severity: 'success', summary: 'Success', detail: response.data.message, life: 3000 });
+            showShareFileDialog.value = false;
         })
         .catch(error => {
             toast.add({ severity: 'error', summary: 'Error', detail: error.response.data.message, life: 6000 });
