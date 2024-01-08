@@ -28,6 +28,7 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/upload', [\App\Http\Controllers\FileController::class, 'upload'])->name('upload');
     Route::post('download', [\App\Http\Controllers\FileController::class, 'download'])->name('download');
+    Route::post('/share', [\App\Http\Controllers\FileController::class, 'share'])->name('share');
     Route::delete('/files', [\App\Http\Controllers\FileController::class, 'delete'])->name('delete');
     Route::patch('/files/rename', [\App\Http\Controllers\FileController::class, 'rename'])->name('rename');
 

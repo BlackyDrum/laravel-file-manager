@@ -177,4 +177,13 @@ class FileController extends Controller
 
         return \response()->json(['id' => $request->input('identifier'), 'name' => $request->input('filename')]);
     }
+
+    public function share(Request $request)
+    {
+        $request->validate([
+            'files' => 'required|array|min:1',
+            'files.*.identifier' => ['bail', 'required', 'string', 'exists:files,identifier', new ValidateFileOwner()],
+            'email' => 'required|string|exists:users,email'
+        ]);
+    }
 }

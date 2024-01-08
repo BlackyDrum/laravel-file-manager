@@ -10,8 +10,7 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import ConfirmDialog from 'primevue/confirmdialog';
 import InputText from 'primevue/InputText';
-import Toast from 'primevue/toast';
-import {FilterMatchMode} from "primevue/api";
+import Dialog from 'primevue/dialog';
 
 
 const props = defineProps(['filterInput', 'files', 'errors'])
@@ -22,6 +21,10 @@ const toast = useToast();
 
 const maxFileSize = ref(import.meta.env.VITE_MAX_FILE_SIZE);
 const maxFileDownloadCount = import.meta.env.VITE_MAX_FILE_DOWNLOAD_COUNT;
+
+const showShareFileDialog = ref(false);
+const currentShareEmail = ref('');
+const isSharingFiles = ref(false);
 
 const tableHeadBackground = ref("#DADADA");
 const selectedFiles = ref([]);
@@ -160,6 +163,42 @@ const handleFileDownload = () => {
         });
 };
 
+const handleFileShare = () => {
+    if (isSharingFiles.value) return;
+
+    const identifiers = selectedFiles.value.map(item => ({ identifier: item.identifier }));
+
+    isSharingFiles.value = true;
+
+    window.axios.post('/share', {
+        files: identifiers,
+        email: currentShareEmail.value,
+    })
+        .then(response => {
+            toast.add({ severity: 'success', summary: 'Success', detail: response.data.message, life: 3000 });
+        })
+        .catch(error => {
+            toast.add({ severity: 'error', summary: 'Error', detail: error.response.data.message, life: 6000 });
+        })
+        .finally(() => {
+            isSharingFiles.value = false;
+        })
+}
+
+const handleFileShareDialogOpen = () =>  {
+    if (selectedFiles.value.length === 0) {
+        toast.add({ severity: 'info', summary: 'Info', detail: 'You need to provide at least 1 file', life: 6000 });
+        return;
+    }
+
+    showShareFileDialog.value = true;
+}
+
+const handleFileShareDialogClose = () => {
+    showShareFileDialog.value = false;
+    currentShareEmail.value = '';
+}
+
 const renameFile = e => {
     let { data, newValue } = e;
 
@@ -200,7 +239,7 @@ const renameFile = e => {
     <ConfirmDialog />
     <div class="flex">
         <div v-if="$page.props.files.length !== 0" class="flex gap-3 ml-auto">
-            <Button class="text-black border-gray-300 bg-white font-medium" :class="{'cursor-not-allowed' : selectedFiles.length === 0}" label="Share" icon="pi pi-share-alt" />
+            <Button class="text-black border-gray-300 bg-white font-medium" :class="{'cursor-not-allowed' : selectedFiles.length === 0}" label="Share" icon="pi pi-share-alt" @click="handleFileShareDialogOpen" />
             <Button class="font-medium" :class="{'cursor-not-allowed' : selectedFiles.length === 0}" label="Download" :icon="isDownloading ? 'pi pi-spin pi-spinner' : 'pi pi-download'" @click="handleFileDownload" />
             <Button class="text-black border-gray-300 bg-white font-medium" :class="{'cursor-not-allowed' : selectedFiles.length === 0}" label="Delete" :icon="isDeleting ? 'pi pi-spin pi-spinner' : 'pi pi-trash'" @click="confirmFileDeletion" />
         </div>
@@ -241,6 +280,17 @@ const renameFile = e => {
 
         </div>
     </div>
+
+    <Dialog v-model:visible="showShareFileDialog" modal header="Share Files" :style="{ width: '25rem' }" >
+        <InputText class="w-full" placeholder="E-Mail" v-model="currentShareEmail" />
+        <div class="flex gap-4 mt-2">
+            <Button class="ml-auto text-black border-gray-300 bg-white font-medium" label="Cancel" icon="pi pi-times" @click="handleFileShareDialogClose" />
+            <Button class="font-medium" label="Share" :icon="isSharingFiles ? 'pi pi-spin pi-spinner' : 'pi pi-share-alt'" @click="handleFileShare" />
+        </div>
+    </Dialog>
+
+
+
 </template>
 
 <style>
