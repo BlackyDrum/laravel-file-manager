@@ -166,6 +166,11 @@ const handleFileDownload = () => {
 const handleFileShare = () => {
     if (isSharingFiles.value) return;
 
+    if (currentShareEmail.value === page.props.auth.user.email) {
+        toast.add({ severity: 'info', summary: 'Info', detail: 'You cannot share files with yourself', life: 6000 });
+        return;
+    }
+
     const identifiers = selectedFiles.value.map(item => ({ identifier: item.identifier }));
 
     isSharingFiles.value = true;

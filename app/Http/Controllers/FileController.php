@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Files;
+use App\Models\User;
 use App\Rules\ValidateFileName;
 use App\Rules\ValidateFileOwner;
 use http\Env\Response;
@@ -185,5 +186,13 @@ class FileController extends Controller
             'files.*.identifier' => ['bail', 'required', 'string', 'exists:files,identifier', new ValidateFileOwner()],
             'email' => 'required|string|exists:users,email'
         ]);
+
+        $user = User::query()->where('email', '=', $request->input('email'))->first();
+
+        if ($user->id == Auth::id()) {
+            abort(400, 'You cannot share files with yourself');
+        }
+
+
     }
 }
