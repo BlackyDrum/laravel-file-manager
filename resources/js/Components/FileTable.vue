@@ -265,7 +265,7 @@ const renameFile = e => {
             </Column>
             <Column field="owner_id" header="Owner" sortable :headerStyle="{background: tableHeadBackground}">
                 <template #body="{data, field}">
-                    {{data["username"]}} {{data[field] === $page.props.auth.user.id ? '(me)' : data[field]}}
+                    {{data["username"]}} {{data[field] === $page.props.auth.user.id ? '(me)' : ''}}
                 </template>
             </Column>
             <Column field="modified" header="Last Modified" sortable :headerStyle="{background: tableHeadBackground}"></Column>
