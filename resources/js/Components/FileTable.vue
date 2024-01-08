@@ -263,9 +263,9 @@ const renameFile = e => {
                     <InputText class="w-full" :disabled="isRenaming.status" v-model="data[field]" autofocus />
                 </template>
             </Column>
-            <Column field="owner_id" header="Owner" sortable :headerStyle="{background: tableHeadBackground}">
+            <Column field="owner" header="Owner" sortable :headerStyle="{background: tableHeadBackground}">
                 <template #body="{data, field}">
-                    {{data["owner"]}} {{data[field] === $page.props.auth.user.id ? '(me)' : ''}}
+                    {{data['owner']}} {{data['owner_id'] === $page.props.auth.user.id ? '(me)' : ''}}
                 </template>
             </Column>
             <Column field="modified" header="Last Modified" sortable :headerStyle="{background: tableHeadBackground}"></Column>
