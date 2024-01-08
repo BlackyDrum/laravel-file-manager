@@ -28,12 +28,16 @@ const showFileUploadDialog = ref(false);
 const filterInput = ref(null);
 
 const files = ref([]);
-const maxFileSize = ref(import.meta.env.VITE_MAX_FILE_SIZE);
-const maxFileUploadCount = import.meta.env.VITE_MAX_FILE_UPLOAD_COUNT;
-const maxFileNameSize = import.meta.env.VITE_MAX_FILE_NAME_SIZE;
 const uploadPercentage = ref(0);
 const uploadProcessing = ref(false);
 let cancelSource = null;
+
+const maxFileSize = ref(import.meta.env.VITE_MAX_FILE_SIZE);
+const maxFileUploadCount = import.meta.env.VITE_MAX_FILE_UPLOAD_COUNT;
+const maxFileNameSize = import.meta.env.VITE_MAX_FILE_NAME_SIZE;
+const maxStorageSize = import.meta.env.VITE_MAX_STORAGE_SIZE;
+
+const currentStorageSize = ref(0);
 
 const fileTypes = ref(['zip', 'tar', 'rar', 'gzip', '7z',
     'mp3', 'mp4', 'mpeg', 'wav', 'ogg', 'opus',
@@ -61,6 +65,12 @@ onMounted(() => {
         e.preventDefault();
     })
     document.addEventListener('drop', handleFileDrop);
+
+    calculateCurrentStorageSize();
+})
+
+onUpdated(() => {
+    calculateCurrentStorageSize();
 })
 
 onBeforeUnmount(() => {
@@ -69,6 +79,17 @@ onBeforeUnmount(() => {
     });
     document.removeEventListener('drop', handleFileDrop);
 })
+
+const calculateCurrentStorageSize = () => {
+    let size = 0;
+    for (const file of page.props.files) {
+        if (file.owner_id === page.props.auth.user.id) {
+            size += file.size;
+        }
+    }
+
+    currentStorageSize.value = size;
+}
 
 const handleFileDrop = (e) => {
     e.preventDefault();
@@ -259,6 +280,12 @@ const close = () => {
                                 {{item.label}}
                             </li>
                         </ul>
+                        <div class="text-sm">
+                            Used {{formatBytes(currentStorageSize)}} / {{formatBytes(maxStorageSize, 0)}}
+                            <div>
+                                <ProgressBar :value="currentStorageSize / maxStorageSize * 100" :showValue="false" :style="{ height: '4px' }" ></ProgressBar>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <hr class="border-gray-300">
