@@ -27,6 +27,7 @@ class FileController extends Controller
     {
         $maxFileSize = intval(env('MAX_FILE_SIZE'));
         $maxFileUploadCount = intval(env('MAX_FILE_UPLOAD_COUNT'));
+        $maxStorageSize = intval(env('MAX_STORAGE_SIZE'));
 
         $fileTypes = ['zip', 'tar', 'rar', 'gzip', '7z',
                       'mp3', 'mp4', 'mpeg', 'wav', 'ogg', 'opus',
@@ -50,6 +51,25 @@ class FileController extends Controller
         ]);
 
         $files = $request->allFiles();
+
+        $currentUserFiles = Files::query()->where('owner_id', '=', Auth::id())->select(['size'])->get();
+        $currentStorageSize = 0;
+        foreach ($currentUserFiles as $file) {
+            $currentStorageSize += $file->size;
+        }
+
+        $uploadFileSize = 0;
+        foreach ($files as $fileWrap) {
+            foreach ($fileWrap as $file) {
+                $uploadFileSize += $file->getSize();
+            }
+        }
+
+        if ($currentStorageSize + $uploadFileSize > $maxStorageSize) {
+            $total = $this->formatBytes($maxStorageSize, 0);
+            abort(403, "Total file size will exceed your storage limit of $total");
+        }
+
 
         if (!is_dir(storage_path() . '/app/user_uploads')) {
             mkdir(storage_path() . '/app/user_uploads');
@@ -204,6 +224,19 @@ class FileController extends Controller
         }
 
         return \response()->json(['message' => 'Files shared']);
+    }
 
+    private function formatBytes($bytes, $decimals = 2) {
+        if (!is_numeric($bytes) || $bytes < 0) {
+            return '0.00 B';
+        }
+
+        $k = 1024;
+        $dm = $decimals < 0 ? 0 : $decimals;
+        $sizes = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+
+        $i = floor(log($bytes) / log($k));
+
+        return sprintf('%s %s', number_format($bytes / pow($k, $i), $dm), $sizes[$i]);
     }
 }

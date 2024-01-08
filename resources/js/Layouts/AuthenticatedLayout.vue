@@ -292,7 +292,7 @@ const close = () => {
                             </li>
                         </ul>
                         <div class="text-sm">
-                            Used {{formatBytes(currentStorageSize)}} / {{formatBytes(maxStorageSize, 0)}}
+                            Used {{formatBytes(currentStorageSize, 0)}} / {{formatBytes(maxStorageSize, 0)}}
                             <div>
                                 <ProgressBar :value="currentStorageSize / maxStorageSize * 100" :showValue="false" :style="{ height: '4px' }" ></ProgressBar>
                             </div>
