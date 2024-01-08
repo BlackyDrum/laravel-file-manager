@@ -37,7 +37,7 @@ class HandleInertiaRequests extends Middleware
             ->join('files', 'files.id', '=', 'shared_files.file_id')
             ->join('users', 'users.id', '=', 'files.owner_id')
             ->select([
-                'users.name AS username',
+                'users.name AS owner',
                 'files.identifier',
                 'files.name',
                 'files.size',
@@ -49,7 +49,7 @@ class HandleInertiaRequests extends Middleware
             ->where('owner_id', Auth::id())
             ->join('users', 'users.id', '=', 'owner_id')
             ->select([
-                'users.name AS username',
+                'users.name AS owner',
                 'files.identifier',
                 'files.name',
                 'files.size',
