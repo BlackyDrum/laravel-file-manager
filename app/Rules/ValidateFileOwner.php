@@ -3,8 +3,10 @@
 namespace App\Rules;
 
 use App\Models\Files;
+use App\Models\SharedFiles;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 
 class ValidateFileOwner implements ValidationRule
@@ -18,8 +20,15 @@ class ValidateFileOwner implements ValidationRule
     {
         $file = Files::query()->where('identifier', '=', $value)->first();
 
-        if ($file->owner_id != Auth::id()) {
-            $fail('You cannot access this file');
+        try {
+            SharedFiles::query()->where('user_id', '=', Auth::id())
+                ->where('file_id', '=', $file->id)
+                ->firstOrFail();
+        } catch (ModelNotFoundException $e) {
+            if ($file->owner_id != Auth::id()) {
+                $fail('You cannot access this file');
+            }
         }
+
     }
 }
