@@ -123,7 +123,7 @@ class FileController extends Controller
             abort(422, 'Total size exceeds limit');
         }
 
-        $filesPath = storage_path() . '/app/user_uploads/' . Auth::id() . '/';
+        $filesPath = storage_path() . '/app/user_uploads/';
 
         if (!file_exists(storage_path() . '/app/tmp')) {
             mkdir(storage_path() . '/app/tmp');
@@ -138,9 +138,9 @@ class FileController extends Controller
 
         foreach ($files as $file) {
             $identifier = $file['identifier'];
-            $filename = Files::query()->where('identifier', '=', $identifier)->first()->name;
+            $f = Files::query()->where('identifier', '=', $identifier)->first();
 
-            $zip->addFile($filesPath . $identifier, $filename);
+            $zip->addFile($filesPath . $f->owner_id . '/' . $identifier, $f->name);
         }
 
         $zip->close();
