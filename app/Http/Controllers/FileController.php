@@ -10,6 +10,7 @@ use App\Rules\ValidateFileOwner;
 use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use \Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -214,14 +215,21 @@ class FileController extends Controller
             abort(400, 'You cannot share files with yourself');
         }
 
+        DB::beginTransaction();
         foreach ($request->input('files') as $file) {
             $f = Files::query()->where('identifier', '=', $file['identifier'])->first();
+
+            if ($f->owner_id == $user->id) {
+                DB::rollBack();
+                abort(400, 'You cannot share a file with it\'s owner');
+            }
 
             SharedFiles::query()->firstOrCreate([
                 'user_id' => $user->id,
                 'file_id' => $f->id,
             ]);
         }
+        DB::commit();
 
         return \response()->json(['message' => 'Files shared']);
     }
