@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Files;
+use App\Models\SharedFiles;
 use App\Models\User;
 use App\Rules\ValidateFileName;
 use App\Rules\ValidateFileOwner;
@@ -193,6 +194,16 @@ class FileController extends Controller
             abort(400, 'You cannot share files with yourself');
         }
 
+        foreach ($request->input('files') as $file) {
+            $f = Files::query()->where('identifier', '=', $file['identifier'])->first();
+
+            SharedFiles::query()->firstOrCreate([
+                'user_id' => $user->id,
+                'file_id' => $f->id,
+            ]);
+        }
+
+        return \response()->json(['message' => 'Files shared']);
 
     }
 }
