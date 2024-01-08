@@ -89,6 +89,8 @@ const calculateCurrentStorageSize = () => {
     }
 
     currentStorageSize.value = size;
+
+    return size;
 }
 
 const handleFileDrop = (e) => {
@@ -128,6 +130,15 @@ const uploadEvent = () => {
     }
     if (files.value.length > maxFileUploadCount) {
         toast.add({ severity: 'info', summary: 'Info', detail: `You can only upload ${maxFileUploadCount} files at once`, life: 6000 });
+        return;
+    }
+
+    let uploadFileSize = 0;
+    for (const file of files.value) {
+        uploadFileSize += file.size;
+    }
+    if (currentStorageSize.value + uploadFileSize > maxStorageSize) {
+        toast.add({ severity: 'info', summary: 'Info', detail: `Total file size will exceed your storage limit of ${formatBytes(maxStorageSize, 0)}`, life: 6000 });
         return;
     }
 
