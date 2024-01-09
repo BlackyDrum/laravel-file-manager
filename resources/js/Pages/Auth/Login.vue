@@ -4,8 +4,9 @@ import GuestLayout from '@/Layouts/GuestLayout.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
+import SecondaryButton from '@/Components/SecondaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import {Head, Link, router, useForm} from '@inertiajs/vue3';
 
 defineProps<{
     canResetPassword?: boolean;
@@ -82,6 +83,10 @@ const submit = () => {
                 >
                     Forgot your password?
                 </Link>
+
+                <SecondaryButton class="ms-4" :class="{ 'opacity-25': form.processing }" @click="router.get('/register')">
+                    Register
+                </SecondaryButton>
 
                 <PrimaryButton class="ms-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
                     Log in
