@@ -20,7 +20,8 @@ class SocialiteController extends Controller
         ], [
             'name' => $githubUser->nickname ?? $githubUser->name,
             'email' => $githubUser->email,
-            'password' => Hash::make(Str::random())
+            'password' => Hash::make(Str::random()),
+            'email_verified_at' => date('Y-m-d H:i:s')
         ]);
 
         Auth::login($user);
@@ -37,7 +38,8 @@ class SocialiteController extends Controller
         ], [
             'name' => $googleUser->nickname ?? $googleUser->name,
             'email' => $googleUser->email,
-            'password' => Hash::make(Str::random())
+            'password' => Hash::make(Str::random()),
+            'email_verified_at' => date('Y-m-d H:i:s')
         ]);
 
         Auth::login($user);
