@@ -70,11 +70,33 @@ $ php artisan serve
 ```
 10. **Visit http://localhost:8000 in your web browser to access the application.**
 
+## OAuth Authentication
+To enable login with Google or GitHub, you need to create OAuth apps on their respective platforms and set the ``client ID``, ``client secret`` and ``client callback`` in the ``.env`` file.
 
-## Adjusting Maximum File Size
-If you wish to modify the maximum file size allowed for uploads, navigate to your ``.env`` file and update the ``MAX_FILE_SIZE`` variable.
+## Email Configuration
+
+Before using Laravel File Manager, it's important to configure the mail settings in your `.env` file. This is necessary for sending verification emails. Follow the steps below to set up the required mail fields:
+
+1. Open the `.env` file located in the root directory of the project.
+
+2. Locate the following fields related to mail configuration and update them with your email service provider's credentials:
+
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=your_mail_host
+MAIL_PORT=your_mail_port
+MAIL_USERNAME=your_mail_username
+MAIL_PASSWORD=your_mail_password
+MAIL_ENCRYPTION=your_mail_encryption
+MAIL_FROM_ADDRESS="your_mail_address"
 ```
+
+
+## Adjusting Maximum File And Storage Size
+If you wish to modify the maximum file and storage size allowed for users, navigate to your ``.env`` file and update the respective variables.
+```env
 MAX_FILE_SIZE=1024000  # Set the maximum file size in bytes
+MAX_STORAGE_SIZE=100000000 # Set the maximum storage size per user in bytes
 ```
 **Note**: Ensure that you update the ``upload_max_filesize`` and ``post_max_size`` values in your ``php.ini`` file to match the desired maximum file size.
 
