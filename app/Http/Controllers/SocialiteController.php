@@ -18,8 +18,25 @@ class SocialiteController extends Controller
         $user = User::updateOrCreate([
             'email' => $githubUser->email,
         ], [
-            'name' => $githubUser->nickname,
+            'name' => $githubUser->nickname ?? $githubUser->name,
             'email' => $githubUser->email,
+            'password' => Hash::make(Str::random())
+        ]);
+
+        Auth::login($user);
+
+        return redirect('/dashboard');
+    }
+
+    public function google()
+    {
+        $googleUser = Socialite::driver('google')->stateless()->user();
+
+        $user = User::updateOrCreate([
+            'email' => $googleUser->email,
+        ], [
+            'name' => $googleUser->nickname ?? $googleUser->name,
+            'email' => $googleUser->email,
             'password' => Hash::make(Str::random())
         ]);
 

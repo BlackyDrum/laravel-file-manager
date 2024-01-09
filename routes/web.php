@@ -25,6 +25,11 @@ Route::get('/auth/github/redirect', function () {
 });
 Route::get('/auth/github/callback', [\App\Http\Controllers\SocialiteController::class, 'github']);
 
+Route::get('/auth/google/redirect', function () {
+    return \Laravel\Socialite\Facades\Socialite::driver('google')->redirect();
+});
+Route::get('/auth/google/callback', [\App\Http\Controllers\SocialiteController::class, 'google']);
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
