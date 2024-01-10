@@ -206,7 +206,7 @@ class FileController extends Controller
         $request->validate([
             'files' => 'required|array|min:1',
             'files.*.identifier' => ['bail', 'required', 'string', 'exists:files,identifier', new ValidateFileOwner()],
-            'email' => 'required|string|exists:users,email'
+            'email' => 'required|email|exists:users,email'
         ]);
 
         $user = User::query()->where('email', '=', $request->input('email'))->first();
