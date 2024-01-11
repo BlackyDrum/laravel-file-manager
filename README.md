@@ -56,19 +56,23 @@ $ php artisan key:generate
 ```
 $ php artisan migrate
 ```
-7. **Install JavaScript dependencies:**
+7. **Seed the database with data:**
+```
+$ php artisan db:seed --class=AppData
+```
+8. **Install JavaScript dependencies:**
 ```
 $ npm install
 ```
-8. **Build the assets:**
+9. **Build the assets:**
 ```
 $ npm run dev
 ```
-9. **Start the development server:**
+10. **Start the development server:**
 ```
 $ php artisan serve
 ```
-10. **Visit http://localhost:8000 in your web browser to access the application.**
+11. **Visit http://localhost:8000 in your web browser to access the application.**
 
 ## OAuth Authentication
 To enable login with Google or GitHub, you need to create OAuth apps on their respective platforms and set the ``client ID``, ``client secret`` and ``client callback`` in the ``.env`` file.
