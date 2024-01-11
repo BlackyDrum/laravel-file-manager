@@ -356,6 +356,13 @@ const close = () => {
                     </ResponsiveNavLink>
                 </div>
 
+                <div class="text-sm p-2">
+                    Used {{formatBytes(currentStorageSize, 0)}} / {{formatBytes(maxStorageSize, 0)}}
+                    <div>
+                        <ProgressBar :value="currentStorageSize / maxStorageSize * 100" :showValue="false" :style="{ height: '4px' }" ></ProgressBar>
+                    </div>
+                </div>
+
                 <!-- Responsive Settings Options -->
                 <div class="pt-4 pb-1 border-t border-gray-200">
                     <div class="px-4">
