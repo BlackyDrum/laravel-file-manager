@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Files;
+use App\Models\SharedFileHasPrivilege;
 use App\Models\SharedFiles;
+use App\Models\SharedFilesPrivileges;
 use App\Models\User;
 use App\Rules\ValidateFileName;
 use App\Rules\ValidateFileOwner;
@@ -103,13 +105,15 @@ class FileController extends Controller
 
         $request->validate([
             'files' => 'required|array|min:1|max:' . $maxFileDownloadCount,
-            'files.*.identifier' => ['bail', 'required', 'string', 'exists:files,identifier', new ValidateFileOwner()]
+            'files.*.identifier' => ['bail', 'required', 'string', 'exists:files,identifier', new ValidateFileOwner('download')]
         ], [
             'files.required' => 'You need to provide at least 1 file',
             'files.array' => 'You need to provide at least 1 file',
             'files.min' => 'You need to provide at least 1 file',
             'files.max' => "You can only download $maxFileDownloadCount files at once",
-            'files.*.identifier.*' => 'Invalid file'
+            'files.*.identifier.required' => 'Invalid file',
+            'files.*.identifier.string' => 'Invalid file',
+            'files.*.identifier.exists' => 'Invalid file',
         ]);
 
         $files = $request->input('files');
@@ -157,19 +161,25 @@ class FileController extends Controller
     {
         $request->validate([
             'files' => 'required|array|min:1',
-            'files.*.identifier' => ['bail', 'required', 'string', 'exists:files,identifier', new ValidateFileOwner()]
+            'files.*.identifier' => ['bail', 'required', 'string', 'exists:files,identifier', new ValidateFileOwner('delete')]
         ], [
             'files.*' => 'You need to provide at least 1 file',
-            'files.*.identifier.*' => 'Invalid file'
+            'files.*.identifier.required' => 'Invalid file',
+            'files.*.identifier.string' => 'Invalid file',
+            'files.*.identifier.exists' => 'Invalid file',
         ]);
 
-        $path = storage_path() . '\app\user_uploads\\' . Auth::id() . '\\';
+        $path = storage_path() . '/app/user_uploads/';
 
         $deleteCount = 0;
 
         foreach ($request->input('files') as $file) {
-            Files::query()->where('identifier', '=', $file['identifier'])->delete();
-            unlink($path . $file['identifier']);
+            $identifier = $file['identifier'];
+            $f = Files::query()->where('identifier', '=', $identifier)->first();
+
+            unlink($path . $f->owner_id . '/' . $file['identifier']);
+
+            $f->delete();
 
             $deleteCount++;
         }
@@ -180,7 +190,7 @@ class FileController extends Controller
     public function rename(Request $request)
     {
         $request->validate([
-            'identifier' => ['bail', 'required', 'string', 'exists:files,identifier', new ValidateFileOwner()],
+            'identifier' => ['bail', 'required', 'string', 'exists:files,identifier', new ValidateFileOwner('rename')],
             'filename' => ['bail', 'required', 'string', 'max:' . env('MAX_FILE_NAME_SIZE'),
                 Rule::unique('files', 'name')->where(function ($query) use ($request) {
                     return $query->where('owner_id', Auth::id());
@@ -205,11 +215,15 @@ class FileController extends Controller
     {
         $request->validate([
             'files' => 'required|array|min:1',
-            'files.*.identifier' => ['bail', 'required', 'string', 'exists:files,identifier', new ValidateFileOwner()],
-            'email' => 'required|email|exists:users,email'
+            'files.*.identifier' => ['bail', 'required', 'string', 'exists:files,identifier', new ValidateFileOwner('share')],
+            'email' => 'required|email|exists:users,email',
+            'privileges' => 'required|array|min:1',
+            'privileges.*.value' => 'required|string|exists:shared_files_privileges,privilege'
         ]);
 
         $user = User::query()->where('email', '=', $request->input('email'))->first();
+
+        $privileges = $request->input('privileges');
 
         if ($user->id == Auth::id()) {
             abort(400, 'You cannot share files with yourself');
@@ -224,10 +238,18 @@ class FileController extends Controller
                 abort(400, 'You cannot share a file with it\'s owner');
             }
 
-            SharedFiles::query()->firstOrCreate([
+            $sharedFile = SharedFiles::query()->firstOrCreate([
                 'user_id' => $user->id,
                 'file_id' => $f->id,
             ]);
+
+            foreach ($privileges as $privilege) {
+                $p = $privilege['value'];
+                SharedFileHasPrivilege::query()->firstOrCreate([
+                    'shared_file_id' => $sharedFile->id,
+                    'privilege_id' => SharedFilesPrivileges::query()->where('privilege', '=', $p)->first()->id,
+                ]);
+            }
         }
         DB::commit();
 

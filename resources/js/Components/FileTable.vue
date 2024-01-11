@@ -11,6 +11,7 @@ import Column from 'primevue/column';
 import ConfirmDialog from 'primevue/confirmdialog';
 import InputText from 'primevue/InputText';
 import Dialog from 'primevue/dialog';
+import MultiSelect from 'primevue/multiselect';
 
 
 const props = defineProps(['filterInput', 'files', 'errors'])
@@ -35,6 +36,13 @@ const isRenaming = ref({
     status: false,
     identifier: '',
 });
+
+const sharePrivileges = ref([
+    {name: 'Download File', value: 'download'},
+    {name: 'Rename File', value: 'rename'},
+    {name: 'Delete File', value: 'delete'},
+]);
+const selectedSharePrivileges = ref([]);
 
 const filters = ref({
     'global': {value: null, matchMode: 'contains'},
@@ -178,6 +186,7 @@ const handleFileShare = () => {
     window.axios.post('/share', {
         files: identifiers,
         email: currentShareEmail.value,
+        privileges: selectedSharePrivileges.value,
     })
         .then(response => {
             toast.add({ severity: 'success', summary: 'Success', detail: response.data.message, life: 3000 });
@@ -192,6 +201,13 @@ const handleFileShare = () => {
 }
 
 const handleFileShareDialogOpen = () =>  {
+    for (const file of selectedFiles.value) {
+        if (file.owner_id !== page.props.auth.user.id) {
+            toast.add({ severity: 'info', summary: 'Info', detail: 'You can only share your own files', life: 6000 });
+            return;
+        }
+    }
+
     if (selectedFiles.value.length === 0) {
         toast.add({ severity: 'info', summary: 'Info', detail: 'You need to provide at least 1 file', life: 6000 });
         return;
@@ -290,6 +306,8 @@ const renameFile = e => {
 
     <Dialog v-model:visible="showShareFileDialog" modal header="Share Files" :style="{ width: '25rem' }" >
         <InputText class="w-full" placeholder="E-Mail" v-model="currentShareEmail" />
+        <MultiSelect v-model="selectedSharePrivileges" :options="sharePrivileges" optionLabel="name" placeholder="Select Privileges"
+                     class="w-full my-4" />
         <div class="flex gap-4 mt-2">
             <Button class="ml-auto text-black border-gray-300 bg-white font-medium" label="Cancel" icon="pi pi-times" @click="handleFileShareDialogClose" />
             <Button class="font-medium" label="Share" :icon="isSharingFiles ? 'pi pi-spin pi-spinner' : 'pi pi-share-alt'" @click="handleFileShare" />

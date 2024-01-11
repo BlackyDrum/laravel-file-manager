@@ -104,7 +104,7 @@ const submit = () => {
         <div class="mt-4">
             <a href="/auth/google/redirect" type="button" class="py-2 px-4 max-w-md flex justify-center items-center bg-[#0069D9] hover:bg-[#004080] focus:ring-[#0069D9] text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg">
                 <i class="pi pi-google" />
-                <span class="ml-2">Sign in with GitHub</span>
+                <span class="ml-2">Sign in with Google</span>
             </a>
         </div>
     </GuestLayout>
