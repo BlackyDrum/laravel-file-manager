@@ -253,6 +253,7 @@ const renameFile = e => {
     <div class="mt-4">
         <DataTable v-if="$page.props.files.length !== 0" :filters="filters" class="font-sans shadow-lg" v-model:selection="selectedFiles"
                    :value="files" tableStyle="min-width: 50rem" scrollable scrollHeight="40rem" editMode="cell" @cell-edit-complete="renameFile">
+            <template #empty> No File found </template>
             <Column selectionMode="multiple" :headerStyle="{background: tableHeadBackground}"></Column>
             <Column class="w-1" v-if="isRenaming.status" :headerStyle="{background: tableHeadBackground}">
                 <template #body="{data}">
