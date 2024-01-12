@@ -553,6 +553,7 @@ const handleFileContextMenuItemClick = (operation) => {
             <Column
                 field="extension"
                 header="Extension"
+                sortable
                 :headerStyle="{ background: tableHeadBackground }"
             >
             </Column>
