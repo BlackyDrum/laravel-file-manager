@@ -40,6 +40,70 @@ const isRenaming = ref({
     identifier: "",
 });
 
+const icons = ref([
+    {
+        extensions: ["zip", "tar", "rar", "gzip", "7z"],
+        icon: "zip.png",
+    },
+    {
+        extensions: ["mp3", "mpeg", "wav", "ogg", "opus"],
+        icon: "audio.png",
+    },
+    {
+        extensions: ["jpeg", "png", "gif", "bmp", "tiff", "svg"],
+        icon: "image.png",
+    },
+    {
+        extensions: [
+            "css",
+            "html",
+            "php",
+            "c",
+            "cpp",
+            "h",
+            "hpp",
+            "js",
+            "java",
+            "py",
+        ],
+        icon: "code.png",
+    },
+    {
+        extensions: ["txt", "log"],
+        icon: "note.png",
+    },
+    {
+        extensions: ["pdf"],
+        icon: "pdf.png",
+    },
+    {
+        extensions: [
+            "mp4",
+            "webm",
+            "mpeg4",
+            "3gpp",
+            "mov",
+            "avi",
+            "wmv",
+            "flv",
+            "ogg",
+        ],
+        icon: "video.png",
+    },
+    {
+        extensions: ["xls", "xlsx"],
+        icon: "excel.png",
+    },
+    {
+        extensions: ["ppt", "pptx"],
+        icon: "powerpoint.png",
+    },
+    {
+        extensions: ["doc", "docx"],
+        icon: "word.png",
+    },
+]);
+
 const sharePrivileges = ref([
     { name: "Download File", value: "download" },
     { name: "Rename File", value: "rename" },
@@ -463,6 +527,19 @@ const handleFileContextMenuItemClick = (operation) => {
                 sortable
                 :headerStyle="{ background: tableHeadBackground }"
             >
+                <template #body="{ data, field }">
+                    <div class="flex">
+                        <div>
+                            <img
+                                :src="`static/icons/${icons.find((i) => i.extensions.includes(data['extension'])).icon}`"
+                                width="30"
+                            />
+                        </div>
+                        <div class="my-auto ml-4">
+                            {{ data[field] }}
+                        </div>
+                    </div>
+                </template>
                 <template #editor="{ data, field }">
                     <InputText
                         class="w-full"
