@@ -141,6 +141,10 @@ const handleFileDrop = (e) => {
     e.preventDefault();
     const droppedFiles = e.dataTransfer.files;
 
+    if (droppedFiles.length === 0) {
+        return;
+    }
+
     for (const file of droppedFiles) {
         files.value.push(file);
     }
