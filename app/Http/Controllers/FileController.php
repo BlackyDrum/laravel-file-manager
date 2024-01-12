@@ -146,7 +146,8 @@ class FileController extends Controller
             $identifier = $file['identifier'];
             $f = Files::query()->where('identifier', '=', $identifier)->first();
 
-            $zip->addFile($filesPath . $f->owner_id . '/' . $identifier, $f->name);
+            $zip->addFile($filesPath . $f->owner_id . '/' . $identifier,
+                str_ends_with($f->name, $f->extension) ? $f->name : $f->name . '.' . $f->extension);
         }
 
         $zip->close();
