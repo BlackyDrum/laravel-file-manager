@@ -533,6 +533,7 @@ const handleFileContextMenuItemClick = (operation) => {
                             <img
                                 :src="`static/icons/${icons.find((i) => i.extensions.includes(data['extension'])).icon}`"
                                 width="30"
+                                class="min-w-9"
                             />
                         </div>
                         <div class="my-auto ml-4">
