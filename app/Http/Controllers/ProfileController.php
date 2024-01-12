@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Files;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -50,6 +51,17 @@ class ProfileController extends Controller
         ]);
 
         $user = $request->user();
+
+        $files = Files::query()->where('owner_id', '=', $user->id)->get();
+
+        $path = storage_path() . '/app/user_uploads/' . $user->id . '/';
+
+        foreach ($files as $file) {
+            unlink($path . $file->identifier);
+            $file->delete();
+        }
+
+        rmdir($path);
 
         Auth::logout();
 
