@@ -25,8 +25,6 @@ import AutoComplete from "primevue/autocomplete";
 import Toast from "primevue/toast";
 import { useToast } from "primevue/usetoast";
 
-////////////////////////////////////////////////
-
 const page = usePage();
 const toast = useToast();
 
