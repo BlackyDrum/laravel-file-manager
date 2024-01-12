@@ -38,7 +38,7 @@ class FileController extends Controller
                       'css', 'html', 'php', 'c', 'cpp', 'h', 'hpp', 'js', 'java', 'py',
                       'txt', 'pdf', 'log',
                       'webm', 'mpeg4', '3gpp', 'mov', 'avi', 'wmv', 'flv', 'ogg',
-                      'xls', 'xlsx', 'ppt', 'pptx', 'doc', 'docx', 'xps'];
+                      'xls', 'xlsx', 'ppt', 'pptx', 'doc', 'docx'];
 
         $request->validate([
             'files' => 'required|array|min:1|max:' . $maxFileUploadCount,

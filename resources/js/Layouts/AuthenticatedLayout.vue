@@ -93,7 +93,6 @@ const fileTypes = ref([
     "pptx",
     "doc",
     "docx",
-    "xps",
 ]);
 
 const getFileTypes = computed(() => {
