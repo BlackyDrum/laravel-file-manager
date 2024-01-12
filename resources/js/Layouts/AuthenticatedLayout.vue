@@ -13,6 +13,7 @@ import Dialog from 'primevue/dialog';
 import FileUpload from 'primevue/fileupload';
 import Badge from 'primevue/Badge';
 import ProgressBar from 'primevue/ProgressBar';
+import AutoComplete from 'primevue/autocomplete';
 import Toast from 'primevue/toast';
 import {useToast} from "primevue/usetoast";
 
@@ -231,7 +232,18 @@ const close = () => {
     uploadPercentage.value = 0;
 }
 
+const items = ref([]);
 
+
+const search = (event) => {
+    let hits = page.props.files.filter(f => f.name.toLowerCase().includes(event.query.toLowerCase()));
+    if (hits) {
+        items.value = [...hits.map(file => file.name)];
+    } else {
+        items.value = [];
+    }
+    emit('filterInput', filterInput)
+}
 </script>
 
 <template>
@@ -389,7 +401,7 @@ const close = () => {
             <div>
                 <div class="hidden lg:flex">
                     <div class="grow flex" v-if="$page.url !== '/profile'">
-                        <InputText v-if="$page.props.files.length !== 0" class="rounded-lg w-3/4 p-3 font-medium" v-model="filterInput" @input="emit('filterInput', filterInput)" placeholder="Search for files" />
+                        <AutoComplete v-if="$page.props.files.length !== 0" :suggestions="items" @complete="search" class="rounded-lg w-3/4 p-3 font-medium" v-model="filterInput" @input="emit('filterInput', filterInput)" placeholder="Search for files" />
                     </div>
                     <!-- Settings Dropdown -->
                     <div class="relative ml-auto mr-10 self-center">
@@ -480,4 +492,13 @@ const close = () => {
     </Dialog>
 
 </template>
+
+<style>
+.p-autocomplete .p-autocomplete-input{
+    width: 100%;
+}
+.p-autocomplete-empty-message {
+    margin-left:0.5rem;
+}
+</style>
 
