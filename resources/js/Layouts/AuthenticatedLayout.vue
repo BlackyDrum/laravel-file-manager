@@ -44,6 +44,8 @@ const maxFileUploadCount = import.meta.env.VITE_MAX_FILE_UPLOAD_COUNT;
 const maxFileNameSize = import.meta.env.VITE_MAX_FILE_NAME_SIZE;
 const maxStorageSize = import.meta.env.VITE_MAX_STORAGE_SIZE;
 
+const autoCompleteItems = ref([]);
+
 const currentStorageSize = ref(0);
 
 const fileTypes = ref([
@@ -327,16 +329,14 @@ const close = () => {
     uploadPercentage.value = 0;
 };
 
-const items = ref([]);
-
 const search = (event) => {
     let hits = page.props.files.filter((f) =>
         f.name.toLowerCase().includes(event.query.toLowerCase()),
     );
     if (hits) {
-        items.value = [...hits.map((file) => file.name)];
+        autoCompleteItems.value = [...hits.map((file) => file.name)];
     } else {
-        items.value = [];
+        autoCompleteItems.value = [];
     }
     emit("filterInput", filterInput);
 };
@@ -591,7 +591,7 @@ const search = (event) => {
                     <div class="grow flex" v-if="$page.url !== '/profile'">
                         <AutoComplete
                             v-if="$page.props.files.length !== 0"
-                            :suggestions="items"
+                            :suggestions="autoCompleteItems"
                             @complete="search"
                             class="rounded-lg w-3/4 p-3 font-medium"
                             v-model="filterInput"
