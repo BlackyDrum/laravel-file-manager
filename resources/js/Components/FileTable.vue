@@ -529,7 +529,7 @@ const handleFileContextMenuItemClick = (operation) => {
             >
                 <template #body="{ data, field }">
                     <div class="flex">
-                        <div>
+                        <div class="my-auto">
                             <img
                                 :src="`static/icons/${icons.find((i) => i.extensions.includes(data['extension'])).icon}`"
                                 width="30"
