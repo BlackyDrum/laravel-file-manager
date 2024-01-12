@@ -14,5 +14,6 @@ class Files extends Model
         'name',
         'size',
         'owner_id',
+        'extension',
     ];
 }

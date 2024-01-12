@@ -43,6 +43,7 @@ class HandleInertiaRequests extends Middleware
                 'files.size',
                 'files.owner_id',
                 'files.updated_at',
+                'files.extension',
             ]);
 
         $files = Files::query()
@@ -55,6 +56,7 @@ class HandleInertiaRequests extends Middleware
                 'files.size',
                 'files.owner_id',
                 'files.updated_at',
+                'files.extension',
             ])
             ->union($shared_files)
             ->get();

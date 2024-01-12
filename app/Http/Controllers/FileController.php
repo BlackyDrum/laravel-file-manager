@@ -92,6 +92,7 @@ class FileController extends Controller
                     'name' => $file->getClientOriginalName(),
                     'size' => $file->getSize(),
                     'owner_id' => Auth::id(),
+                    'extension' => $file->extension(),
                 ]);
             }
         }
