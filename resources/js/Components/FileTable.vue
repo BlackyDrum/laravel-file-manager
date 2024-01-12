@@ -12,6 +12,7 @@ import ConfirmDialog from 'primevue/confirmdialog';
 import InputText from 'primevue/InputText';
 import Dialog from 'primevue/dialog';
 import MultiSelect from 'primevue/multiselect';
+import OverlayPanel from 'primevue/overlaypanel';
 
 
 const props = defineProps(['filterInput', 'files', 'errors'])
@@ -26,6 +27,9 @@ const maxFileDownloadCount = import.meta.env.VITE_MAX_FILE_DOWNLOAD_COUNT;
 const showShareFileDialog = ref(false);
 const currentShareEmail = ref('');
 const isSharingFiles = ref(false);
+
+const overlayPanel = ref();
+const selectedFileContextMenu = ref('');
 
 const tableHeadBackground = ref("#DADADA");
 const selectedFiles = ref([]);
@@ -258,10 +262,49 @@ const renameFile = e => {
         })
 }
 
+const handleFileContextMenu = (identifier, event) => {
+    selectedFileContextMenu.value = identifier;
+    overlayPanel.value.toggle(event);
+}
+
+const handleFileContextMenuItemClick = (operation) => {
+    selectedFiles.value.splice(0);
+    selectedFiles.value.push(files.value.find(f => f.identifier === selectedFileContextMenu.value))
+    if (operation === 'download') {
+        handleFileDownload();
+    }
+    else if (operation === 'delete') {
+        confirmFileDeletion();
+    }
+}
+
 </script>
 
 <template>
     <ConfirmDialog />
+    <OverlayPanel ref="overlayPanel">
+        <div class="flex hover:bg-gray-100 cursor-pointer p-2" @click="handleFileContextMenuItemClick('download')">
+            <div class="mr-4">
+                <i :class="isDownloading ? 'pi pi-spin pi-spinner' : 'pi pi-download'" />
+            </div>
+            <div class="font-sans">
+                Download
+            </div>
+        </div>
+
+        <hr class="my-2">
+
+        <div class="flex hover:bg-gray-100 cursor-pointer p-2" @click="handleFileContextMenuItemClick('delete')">
+            <div class="mr-4">
+                <i :class="isDeleting ? 'pi pi-spin pi-spinner' : 'pi pi-trash'" />
+            </div>
+            <div class="font-sans">
+                Delete
+            </div>
+        </div>
+
+    </OverlayPanel>
+
     <div class="flex">
         <div v-if="$page.props.files.length !== 0" class="flex gap-3 ml-auto">
             <Button class="text-black border-gray-300 bg-white font-medium" :class="{'cursor-not-allowed' : selectedFiles.length === 0}" label="Share" icon="pi pi-share-alt" @click="handleFileShareDialogOpen" />
@@ -290,9 +333,14 @@ const renameFile = e => {
                 </template>
             </Column>
             <Column field="modified" header="Last Modified" sortable :headerStyle="{background: tableHeadBackground}"></Column>
-            <Column field="size" header="Size" sortable :headerStyle="{background: tableHeadBackground}">
+            <Column  style="width: 15%" field="size" header="Size" sortable :headerStyle="{background: tableHeadBackground}">
                 <template #body="{data, field}">
                     {{formatBytes(data[field])}}
+                </template>
+            </Column>
+            <Column style="width: 4%" :headerStyle="{background: tableHeadBackground}">
+                <template #body="{data, field}">
+                    <i class="pi pi-ellipsis-v cursor-pointer p-3 rounded-full hover:bg-gray-100" @click="handleFileContextMenu(data.identifier, $event)" />
                 </template>
             </Column>
         </DataTable>
@@ -329,5 +377,9 @@ const renameFile = e => {
 
 .p-checkbox .p-highlight  {
     background-color: #007BFF;
+}
+
+.p-overlaypanel .p-overlaypanel-content {
+    padding: 0.25rem;
 }
 </style>
