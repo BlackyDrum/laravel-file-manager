@@ -61,7 +61,9 @@ class ProfileController extends Controller
             $file->delete();
         }
 
-        rmdir($path);
+        if (is_dir($path)) {
+            rmdir($path);
+        }
 
         Auth::logout();
 
