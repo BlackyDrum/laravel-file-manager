@@ -44,6 +44,12 @@ class ValidateFileOwner implements ValidationRule
             }
 
             if (!$hasPrivilege) {
+                Log::channel('app')->warning('Validation failed: User does not have required privileges', [
+                    'user_id' => Auth::id(),
+                    'file_id' => $file->id,
+                    'required_privilege' => $this->privilege,
+                ]);
+
                 $fail('You do not have the required privileges');
             }
         }

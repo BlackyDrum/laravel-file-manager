@@ -9,20 +9,22 @@ use App\Models\SharedFilesPrivileges;
 use App\Models\User;
 use App\Rules\ValidateFileName;
 use App\Rules\ValidateFileOwner;
-use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use \Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
-use const http\Client\Curl\AUTH_ANY;
 
 class FileController extends Controller
 {
     public function dashboard(Request $request)
     {
+        Log::channel('app')->info('User visited the dashboard',[
+            'ip' => $request->getClientIp(),
+            'id' => Auth::id(),
+        ]);
         return Inertia::render('Dashboard');
     }
 
@@ -70,6 +72,15 @@ class FileController extends Controller
 
         if ($currentStorageSize + $uploadFileSize > $maxStorageSize) {
             $total = $this->formatBytes($maxStorageSize, 0);
+
+            Log::channel('app')->info('File upload denied: Storage limit exceeded', [
+                'ip' => $request->getClientIp(),
+                'id' => Auth::id(),
+                'total_file_size' => $uploadFileSize,
+                'current_storage_size' => $currentStorageSize,
+                'max_storage_size' => $maxStorageSize,
+            ]);
+
             abort(403, "Total file size will exceed your storage limit of $total");
         }
 
@@ -81,6 +92,11 @@ class FileController extends Controller
         $path = storage_path() . '/app/user_uploads/' . Auth::id();
         if (!is_dir($path)) {
             mkdir($path);
+            Log::channel('app')->info('User upload directory created', [
+                'ip' => $request->getClientIp(),
+                'id' => Auth::id(),
+                'path' => $path
+            ]);
         }
 
         foreach ($files as $fileWrap) {
@@ -91,6 +107,16 @@ class FileController extends Controller
                     'identifier' => basename($id),
                     'name' => $file->getClientOriginalName(),
                     'size' => $file->getSize(),
+                    'owner_id' => Auth::id(),
+                    'extension' => $file->extension(),
+                ]);
+
+                Log::channel('app')->info('File uploaded successfully', [
+                    'ip' => $request->getClientIp(),
+                    'id' => Auth::id(),
+                    'identifier' => basename($id),
+                    'file_name' => $file->getClientOriginalName(),
+                    'file_size' => $file->getSize(),
                     'owner_id' => Auth::id(),
                     'extension' => $file->extension(),
                 ]);
@@ -126,6 +152,13 @@ class FileController extends Controller
         }
 
         if ($totalSize >  env('MAX_FILE_SIZE')) {
+            Log::channel('app')->info('Download aborted: Total size exceeds limit', [
+                'ip' => $request->getClientIp(),
+                'id' => Auth::id(),
+                'total_size' => $totalSize,
+                'max_download_size' => env('MAX_DOWNLOAD_SIZE'),
+            ]);
+
             abort(422, 'Total size exceeds limit');
         }
 
@@ -139,6 +172,12 @@ class FileController extends Controller
         $zipPath = '/tmp/' . Auth::id() . '.zip';
 
         if (!$zip->open(storage_path() . '/app' . $zipPath, \ZipArchive::CREATE)) {
+            Log::channel('app')->error('Failed to open zip archive for writing', [
+                'ip' => $request->getClientIp(),
+                'id' => Auth::id(),
+                'zip_path' => storage_path() . '/app' . $zipPath,
+            ]);
+
             abort(500, 'Server Error');
         }
 
@@ -148,12 +187,25 @@ class FileController extends Controller
 
             $zip->addFile($filesPath . $f->owner_id . '/' . $identifier,
                 str_ends_with($f->name, $f->extension) ? $f->name : $f->name . '.' . $f->extension);
+
+            Log::channel('app')->info('File added to temporary zip', [
+                'ip' => $request->getClientIp(),
+                'id' => Auth::id(),
+                'file_identifier' => $identifier,
+                'zip_path' => storage_path() . '/app' . $zipPath,
+            ]);
         }
 
         $zip->close();
 
-        register_shutdown_function(function() use ($zipPath) {
+        register_shutdown_function(function() use ($zipPath, $request) {
             Storage::delete($zipPath);
+
+            Log::channel('app')->info('Zip file deleted on shutdown', [
+                'ip' => $request->getClientIp(),
+                'id' => Auth::id(),
+                'zip_path' => storage_path() . '/app' . $zipPath,
+            ]);
         });
 
         return Storage::download($zipPath, 'Files.zip');
@@ -183,6 +235,13 @@ class FileController extends Controller
 
             $f->delete();
 
+            Log::channel('app')->info('File deleted', [
+                'ip' => $request->getClientIp(),
+                'id' => Auth::id(),
+                'file_identifier' => $identifier,
+                'file_path' => $path . $f->owner_id . '/' . $identifier,
+            ]);
+
             $deleteCount++;
         }
 
@@ -210,6 +269,12 @@ class FileController extends Controller
                 'name' => $request->input('filename')
             ]);
 
+        Log::channel('app')->info('File renamed', [
+            'ip' => $request->getClientIp(),
+            'id' => Auth::id(),
+            'file_identifier' => $request->input('identifier'),
+        ]);
+
         return \response()->json(['id' => $request->input('identifier'), 'name' => $request->input('filename')]);
     }
 
@@ -228,6 +293,11 @@ class FileController extends Controller
         $privileges = $request->input('privileges');
 
         if ($user->id == Auth::id()) {
+            Log::channel('app')->info('User attempted to share files with themselves', [
+                'ip' => $request->getClientIp(),
+                'id' => Auth::id(),
+            ]);
+
             abort(400, 'You cannot share files with yourself');
         }
 
@@ -236,6 +306,12 @@ class FileController extends Controller
             $f = Files::query()->where('identifier', '=', $file['identifier'])->first();
 
             if ($f->owner_id == $user->id) {
+                Log::channel('app')->info('User attempted to share a file with its owner', [
+                    'ip' => $request->getClientIp(),
+                    'id' => Auth::id(),
+                    'file_id' => $f->id,
+                ]);
+
                 DB::rollBack();
                 abort(400, 'You cannot share a file with it\'s owner');
             }
@@ -247,10 +323,20 @@ class FileController extends Controller
 
             foreach ($privileges as $privilege) {
                 $p = $privilege['value'];
-                SharedFileHasPrivilege::query()->firstOrCreate([
+                $sf = SharedFileHasPrivilege::query()->firstOrCreate([
                     'shared_file_id' => $sharedFile->id,
                     'privilege_id' => SharedFilesPrivileges::query()->where('privilege', '=', $p)->first()->id,
                 ]);
+
+                if ($sf->wasRecentlyCreated) {
+                    Log::channel('app')->info('Privilege assigned to shared file', [
+                        'ip' => $request->getClientIp(),
+                        'id' => Auth::id(),
+                        'file_id' => $f->id,
+                        'shared_file_id' => $sharedFile->id,
+                        'privilege' => $p,
+                    ]);
+                }
             }
         }
         DB::commit();
