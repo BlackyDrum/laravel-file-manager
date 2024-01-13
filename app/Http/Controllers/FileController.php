@@ -21,10 +21,6 @@ class FileController extends Controller
 {
     public function dashboard(Request $request)
     {
-        Log::channel('app')->info('User visited the dashboard',[
-            'ip' => $request->getClientIp(),
-            'id' => Auth::id(),
-        ]);
         return Inertia::render('Dashboard');
     }
 
