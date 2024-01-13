@@ -15,6 +15,8 @@ import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
 import Dropdown from "@/Components/Dropdown.vue";
 
+import formatBytes from "@/formatBytes";
+
 import Button from "primevue/button";
 import InputText from "primevue/InputText";
 import Dialog from "primevue/dialog";
@@ -288,18 +290,6 @@ const uploadEvent = () => {
             showFileUploadDialog.value = false;
             uploadProcessing.value = false;
         });
-};
-
-const formatBytes = (bytes, decimals = 2) => {
-    if (!+bytes) return "0.00 B";
-
-    const k = 1024;
-    const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ["B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"];
-
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 };
 
 const handleFileUploadDialog = () => {
