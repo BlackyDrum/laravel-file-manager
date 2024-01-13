@@ -595,7 +595,9 @@ const handleFileContextMenuItemClick = (operation) => {
                 <div
                     class="pi pi-cloud-upload mx-auto my-20 text-[10rem]"
                 ></div>
-                <div class="mx-auto text-2xl">Upload Files to get started!</div>
+                <div class="mx-auto text-2xl text-center">
+                    Drag & Drop your files to get started!
+                </div>
             </div>
         </div>
     </div>
