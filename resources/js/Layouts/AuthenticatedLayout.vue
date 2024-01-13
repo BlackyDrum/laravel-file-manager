@@ -15,7 +15,7 @@ import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
 import Dropdown from "@/Components/Dropdown.vue";
 
-import formatBytes from "@/formatBytes";
+import formatBytes from "@/src/formatBytes";
 
 import Button from "primevue/button";
 import InputText from "primevue/InputText";
