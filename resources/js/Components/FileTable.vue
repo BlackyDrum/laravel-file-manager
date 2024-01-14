@@ -451,6 +451,7 @@ const handleIframeLoad = () => {
 <template>
     <Dialog
         class="bg-white h-screen w-screen"
+        :class="{ 'w-60 h-60': showIframeLoadingSpinner }"
         v-model:visible="showPreviewDialog"
         modal
         header="Preview"
@@ -466,6 +467,7 @@ const handleIframeLoad = () => {
             />
         </div>
         <iframe
+            :class="{ hidden: showIframeLoadingSpinner }"
             class="w-full h-full"
             :src="`/file/${previewFile}/preview`"
             @load="handleIframeLoad"
