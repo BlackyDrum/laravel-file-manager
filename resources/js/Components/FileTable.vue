@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { onMounted, ref, defineProps, onUpdated, onBeforeUpdate } from "vue";
+import {
+    onMounted,
+    ref,
+    defineProps,
+    onUpdated,
+    onBeforeUpdate,
+    watch,
+} from "vue";
 import { router, usePage } from "@inertiajs/vue3";
 
 import { useConfirm } from "primevue/useconfirm";
@@ -15,6 +22,7 @@ import InputText from "primevue/InputText";
 import Dialog from "primevue/dialog";
 import MultiSelect from "primevue/multiselect";
 import OverlayPanel from "primevue/overlaypanel";
+import ProgressSpinner from "primevue/progressspinner";
 
 const props = defineProps(["filterInput", "files", "errors"]);
 
@@ -31,6 +39,11 @@ const isSharingFiles = ref(false);
 
 const overlayPanel = ref();
 const selectedFileContextMenu = ref("");
+
+const showPreviewDialog = ref(false);
+const previewFile = ref(null);
+const isLoadingPreview = ref(false);
+const showIframeLoadingSpinner = ref(true);
 
 const tableHeadBackground = ref("#DADADA");
 const selectedFiles = ref([]);
@@ -413,13 +426,70 @@ const handleFileContextMenuItemClick = (operation) => {
         handleFileDownload();
     } else if (operation === "delete") {
         confirmFileDeletion();
+    } else if (operation === "preview") {
+        handleFilePreview(selectedFileContextMenu.value);
     }
+};
+
+const handleFilePreview = (identifier) => {
+    previewFile.value = identifier;
+
+    showPreviewDialog.value = true;
+};
+
+watch(showPreviewDialog, (newValue) => {
+    if (!newValue) {
+        showIframeLoadingSpinner.value = true;
+    }
+});
+
+const handleIframeLoad = () => {
+    showIframeLoadingSpinner.value = false;
 };
 </script>
 
 <template>
+    <Dialog
+        class="bg-white h-screen w-screen"
+        v-model:visible="showPreviewDialog"
+        modal
+        header="Preview"
+    >
+        <div v-if="showIframeLoadingSpinner" class="flex h-full">
+            <ProgressSpinner
+                class="m-auto"
+                style="width: 50px; height: 50px"
+                strokeWidth="8"
+                fill="var(--surface-ground)"
+                animationDuration=".5s"
+                aria-label="Custom ProgressSpinner"
+            />
+        </div>
+        <iframe
+            class="w-full h-full"
+            :src="`/file/${previewFile}/preview`"
+            @load="handleIframeLoad"
+        ></iframe>
+    </Dialog>
+
     <ConfirmDialog />
     <OverlayPanel ref="overlayPanel">
+        <div
+            class="flex hover:bg-gray-100 cursor-pointer p-2"
+            @click="handleFileContextMenuItemClick('preview')"
+        >
+            <div class="mr-4">
+                <i
+                    :class="
+                        isLoadingPreview
+                            ? 'pi pi-spin pi-spinner'
+                            : 'pi pi-arrow-right-arrow-left'
+                    "
+                />
+            </div>
+            <div class="font-sans">Preview</div>
+        </div>
+
         <div
             class="flex hover:bg-gray-100 cursor-pointer p-2"
             @click="handleFileContextMenuItemClick('download')"
@@ -651,5 +721,8 @@ const handleFileContextMenuItemClick = (operation) => {
 
 .p-overlaypanel .p-overlaypanel-content {
     padding: 0.25rem;
+}
+.p-dialog-content {
+    height: 100%;
 }
 </style>

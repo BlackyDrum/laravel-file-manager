@@ -42,6 +42,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/files', [\App\Http\Controllers\FileController::class, 'delete'])->name('delete');
     Route::patch('/files/rename', [\App\Http\Controllers\FileController::class, 'rename'])->name('rename');
 
+    Route::get('/file/{identifier}/preview', [\App\Http\Controllers\FileController::class, 'preview'])->name('preview');
+
     Route::get('/dashboard', [\App\Http\Controllers\FileController::class, 'dashboard'])->name('dashboard');
 });
 

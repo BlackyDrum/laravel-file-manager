@@ -9,10 +9,12 @@ use App\Models\SharedFilesPrivileges;
 use App\Models\User;
 use App\Rules\ValidateFileName;
 use App\Rules\ValidateFileOwner;
+use Faker\Core\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -338,6 +340,19 @@ class FileController extends Controller
         DB::commit();
 
         return \response()->json(['message' => 'Files shared']);
+    }
+
+    public function preview(Request $request, string $identifier) {
+        $file = Files::query()->where('identifier', '=', $identifier)->first();
+
+        $path = '/user_uploads/' . $file->owner_id . '/' . $identifier;
+
+        $mime = Storage::mimeType($path);
+
+        return Storage::download($path,$file->name, [
+            'Content-Type' => $mime,
+            'Content-Disposition' => 'inline',
+        ]);
     }
 
     private function formatBytes($bytes, $decimals = 2) {
