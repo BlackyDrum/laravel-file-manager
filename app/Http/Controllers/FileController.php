@@ -82,11 +82,6 @@ class FileController extends Controller
             abort(403, "Total file size will exceed your storage limit of $total");
         }
 
-
-        if (!is_dir(storage_path() . '/app/user_uploads')) {
-            mkdir(storage_path() . '/app/user_uploads');
-        }
-
         $path = storage_path() . '/app/user_uploads/' . Auth::id();
         if (!is_dir($path)) {
             mkdir($path);
@@ -161,10 +156,6 @@ class FileController extends Controller
         }
 
         $filesPath = storage_path() . '/app/user_uploads/';
-
-        if (!file_exists(storage_path() . '/app/tmp')) {
-            mkdir(storage_path() . '/app/tmp');
-        }
 
         $zip = new \ZipArchive();
         $zipPath = '/tmp/' . Auth::id() . '.zip';

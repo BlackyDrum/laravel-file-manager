@@ -20,5 +20,13 @@ class AppData extends Seeder
                 'privilege' => $privilege
             ]);
         }
+
+        if (!file_exists(storage_path() . '/app/user_uploads')) {
+            mkdir(storage_path() . '/app/user_uploads');
+        }
+
+        if (!file_exists(storage_path() . '/app/tmp')) {
+            mkdir(storage_path() . '/app/tmp');
+        }
     }
 }
