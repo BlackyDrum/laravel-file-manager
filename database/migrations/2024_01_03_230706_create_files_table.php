@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('files', function (Blueprint $table) {
             $table->id();
             $table->string('identifier', 255)->unique();
-            $table->string('name', intval(env('MAX_FILE_NAME_SIZE')));
+            $table->string('name', 512);
             $table->unsignedBigInteger('size');
             $table->unsignedBigInteger('owner_id');
             $table->timestamps();

@@ -21,7 +21,7 @@ class ValidateFileName implements ValidationRule
         $maxFileNameSize = intval(env('MAX_FILE_NAME_SIZE'));
 
         if (strlen($filename) > $maxFileNameSize) {
-            $fail('The filename cannot not be greater than 64 characters');
+            $fail("The filename cannot be greater than $maxFileNameSize characters");
         }
 
         $file = Files::query()->where('name', '=', $filename)
