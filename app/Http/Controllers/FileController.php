@@ -334,6 +334,13 @@ class FileController extends Controller
     }
 
     public function preview(Request $request, string $identifier) {
+        // TODO: Currently, there is a security concern related to persistent XSS when previewing HTML
+        //       files containing script code. This issue needs to be addressed and mitigated before enabling
+        //       inline preview of HTML files.
+
+        // For now, we are redirecting back to the previous page to avoid potential security risks.
+        return back();
+
         $file = Files::query()->where('identifier', '=', $identifier)->first();
 
         $path = '/user_uploads/' . $file->owner_id . '/' . $identifier;

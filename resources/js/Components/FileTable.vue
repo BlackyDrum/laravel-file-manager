@@ -449,6 +449,7 @@ const handleIframeLoad = () => {
 </script>
 
 <template>
+    <!--
     <Dialog
         class="bg-white h-screen w-screen"
         :class="{ 'w-60 h-60': showIframeLoadingSpinner }"
@@ -474,10 +475,13 @@ const handleIframeLoad = () => {
         ></iframe>
     </Dialog>
 
+    -->
+
     <ConfirmDialog />
     <OverlayPanel ref="overlayPanel">
-        <div
-            class="flex hover:bg-gray-100 cursor-pointer p-2"
+        <button
+            class="flex hover:bg-gray-100 p-2 w-full disabled:opacity-25"
+            disabled
             @click="handleFileContextMenuItemClick('preview')"
         >
             <div class="mr-4">
@@ -490,7 +494,7 @@ const handleIframeLoad = () => {
                 />
             </div>
             <div class="font-sans">Preview</div>
-        </div>
+        </button>
 
         <div
             class="flex hover:bg-gray-100 cursor-pointer p-2"
